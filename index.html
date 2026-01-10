@@ -251,15 +251,18 @@
             <div id="impiantoDetails" class="scheda-item"></div>
 
             <div id="sezione-verbali" class="section-box">
-                <h3>📄 Verbali SharePoint</h3>
+                <h3>📄 Verbali</h3>
                 <div id="lista-verbali"></div>
             </div>
 
             <div id="sezione-commesse" class="section-box" style="border-left-color: var(--info-blue);">
-                <h3>🔧 Commesse M28</h3>
+                <h3>🔧 Commesse</h3>
                 <div id="lista-commesse"></div>
             </div>
-
+<div id="sezione-archivio" class="section-box" style="border-left-color: #ff9800;">
+                <h3>📄 Archivio DC</h3>
+                <div id="lista-archivio"></div>
+            </div>
             <button onclick="document.getElementById('dettagli-container').style.display='none'; window.scrollTo(0,0);" class="btn" style="margin-top:20px; background:#666;">CHIUDI</button>
         </div>
     </div>
@@ -312,16 +315,31 @@
         function mostraRisultati(results) {
             const container = document.getElementById('results');
             document.getElementById('dettagli-container').style.display = 'none';
-            if (results.length === 0) return container.innerHTML = '<p style="padding:15px;">Nessun risultato.</p>';
 
-            container.innerHTML = results.slice(0, 30).map(item => `
-                    <div class="result-item" onclick="apriDettaglio('${item.impianto}')">
-                        <strong>${item.impianto}</strong> - ${item['Indirizzo impianto']}<br>
-                        <small>👤 ${item.venditore || '-'} | 🔄 ${mappature.giri[item.giro] || item.giro || '-'}</small>
+            if (results.length === 0) {
+                container.innerHTML = '<div style="padding:15px; text-align:center;">Nessun risultato trovato.</div>';
+                return;
+            }
+
+            let html = '';
+            results.slice(0, 50).forEach(item => {
+                const giroText = (item.giro == 77 || item.giro == 88 || item.giro == 99)
+                    ? `<span style="color:red; font-weight:bold;">DISDETTA</span>`
+                    : (mappature.giri[item.giro] || item.giro || 'N/A');
+
+                // MODIFICA QUI: Aggiunta Località impianto
+                html += `
+                <div class="result-item" onclick="apriDettaglio('${item.impianto}')">
+                    <div style="font-weight:bold; font-size:1.1rem; margin-bottom:4px;">${item.impianto} <span style="font-weight:normal; font-size:0.9rem; color:#666;">(Matr. ${item.matricola || '-'})</span></div>
+                    <div style="font-size:0.95rem; margin-bottom:4px;">📍 ${item['Indirizzo impianto']} - ${item['Località impianto'] || ''}</div>
+                    <div style="font-size:0.85rem; color:#555;">👤 ${item.venditore || 'N/D'} | 🔄 ${giroText}</div>
+                    <div style="margin-top:8px; text-align:right;">
+                        <span style="color:var(--secondary-color); font-weight:bold; font-size:0.9rem;">Tocca per dettagli ></span>
                     </div>
-                `).join('');
+                </div>`;
+            });
+            container.innerHTML = html;
         }
-
         function excelDateToJS(ed) { return ed ? new Date(Math.round((ed - 25569) * 86400 * 1000)) : null; }
         function fmt(ed) {
             const d = excelDateToJS(ed);
@@ -362,6 +380,26 @@
 
             document.getElementById('dettagli-container').style.display = 'block';
             document.getElementById('dettagli-container').scrollIntoView({ behavior: 'smooth' });
+
+// Archivio DC (da ARCHIVIO)
+            const codImpianto = String(cod).trim();
+            const recordsArchivio = archivioData.filter(r => {
+                const esa = String(r['N°IMPIANTO ESA'] || '').trim();
+                return esa === codImpianto || esa === codImpianto.replace(/^0+/, '');
+            });
+
+            document.getElementById('lista-archivio').innerHTML = recordsArchivio.length ? recordsArchivio.map(r => `
+                <div class="commessa-item" style="background: #fffde7; padding: 5px; border-radius: 4px; margin-bottom: 5px;">
+                    <strong>Pratica: ${r['N°  PRATICA ARCHIVIO'] || 'N/D'}</strong><br>
+                    <small>Richiesta: ${r['DOC RICHIESTI'] || 'N/D'} (${fmt(r['Column12'])})</small><br>
+                    <small>Consegna: ${r['DOCS PER CLIENTE CONSEGNATI'] || 'N/D'} (${fmt(r['Column17'])})</small>
+                </div>
+            `).join('') : '<p class="placeholder">✅ Nessuna Dichiarazione presente</p>';
+
+            document.getElementById('dettagli-container').style.display = 'block';
+            document.getElementById('dettagli-container').scrollIntoView({ behavior: 'smooth' });
+
+
         }
     </script>
 </body>
