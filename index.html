@@ -1,1055 +1,512 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ricerca Impianti</title>
-    <link rel="stylesheet" href="style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Ricerca Impianti Mobile</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-        /* Reset di base */
+        /* --- STILI BASE E VARIABILI --- */
+        :root {
+            --primary-color: #1b5e20;
+            --secondary-color: #4caf50;
+            --bg-gradient: linear-gradient(135deg, #a5d6a7 0%, #66bb6a 100%);
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --shadow: 0 4px 15px rgba(0,0,0,0.15);
+        }
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        :root {
-            --glass-bg: rgba(255, 255, 255, 0.15);
-            --shadow: 0 8px 32px rgba(46, 125, 50, 0.2);
-            --primary-color: #1b5e20; /* Verde scuro */
-            --secondary-color: #4caf50; /* Verde principale */
-            --light-text: #ffffff;
-            --success-color: #2e7d32; /* Verde successo */
-            --warning-color: #ff9800; /* Arancione */
-            --danger-color: #f44336; /* Rosso */
-            --info-color: #2196f3; /* Blu */
-            --accent-color: #8bc34a; /* Verde chiaro */
+            -webkit-tap-highlight-color: transparent;
         }
 
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #a5d6a7 0%, #66bb6a 100%); /* Verde chiaro */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background: var(--bg-gradient);
             color: #333;
             min-height: 100vh;
-            padding: 20px;
+            padding: 10px;
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 100%;
             margin: 0 auto;
-            padding: 20px;
+            padding-bottom: 60px; /* Spazio per footer */
         }
 
+        /* --- HEADER & TITOLI --- */
         h1 {
             text-align: center;
             color: var(--primary-color);
-            margin-bottom: 30px;
-            font-size: 2.5rem;
-            text-shadow: 1px 1px 3px rgba(255, 255, 255, 0.5);
-            background: rgba(255, 255, 255, 0.7);
-            padding: 15px;
-            border-radius: 10px;
-            border: 1px solid rgba(76, 175, 80, 0.3);
+            font-size: 1.5rem;
+            margin: 10px 0 20px 0;
+            background: rgba(255,255,255,0.6);
+            padding: 10px;
+            border-radius: 8px;
         }
 
         h2 {
             color: var(--primary-color);
-            margin-bottom: 20px;
+            font-size: 1.2rem;
             border-bottom: 2px solid var(--secondary-color);
-            padding-bottom: 10px;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
         }
 
         h3 {
             color: var(--primary-color);
-            margin-bottom: 15px;
-        }
-
-        h4 {
-            color: var(--primary-color);
-            margin-bottom: 10px;
             font-size: 1.1rem;
+            margin-top: 15px;
         }
 
-        /* Layout a colonne */
-        .row {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-        }
-
-        /* Colonna di sinistra (40% più larga) */
-        .search-column {
-            flex: 1.4; /* 40% più larga */
-        }
-
-        /* Colonna di destra */
-        .details-column {
-            flex: 1; /* Larghezza base */
-        }
-
+        /* --- LAYOUT MOBILE --- */
         .column {
-            background: rgba(255, 255, 255, 0.85);
-            padding: 20px;
-            border-radius: 10px;
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 12px;
             box-shadow: var(--shadow);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(76, 175, 80, 0.2);
+            margin-bottom: 20px;
         }
 
-        /* Form e input */
+        /* --- FORM E INPUT --- */
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
         label {
             display: block;
             font-weight: 600;
-            margin-bottom: 8px;
+            margin-bottom: 5px;
             color: var(--primary-color);
         }
 
-        input[type="file"],
-        input[type="text"],
-        select {
+        /* Input ottimizzati per il tocco */
+        input[type="text"] {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #a5d6a7;
-            border-radius: 6px;
-            font-size: 16px;
-            background: rgba(255, 255, 255, 0.95);
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            padding: 12px; /* Area tocco più grande */
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px; /* Evita zoom automatico su iPhone */
         }
 
-            input[type="file"]:focus,
-            input[type="text"]:focus,
-            select:focus {
-                border-color: var(--secondary-color);
-                box-shadow: 0 0 8px rgba(76, 175, 80, 0.4);
-                outline: none;
-            }
-
-        /* Bottoni */
         .btn {
-            display: inline-block;
-            padding: 12px 24px;
+            width: 100%;
+            padding: 14px;
             background: var(--secondary-color);
             color: white;
             border: none;
-            border-radius: 6px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            border: 2px solid transparent;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
 
-            .btn:hover {
+            .btn:active {
+                transform: scale(0.98);
                 background: var(--primary-color);
-                transform: translateY(-2px);
-                box-shadow: 0 4px 12px rgba(27, 94, 32, 0.3);
             }
 
-        /* Risultati della ricerca */
-        .results-container {
-            margin-top: 20px;
-            max-height: 600px;
-            overflow-y: auto;
-            border: 1px solid #c8e6c9;
-            border-radius: 6px;
+        /* --- INDICATORE DI STATO --- */
+        #status-bar {
+            text-align: center;
             padding: 10px;
-            background: rgba(255, 255, 255, 0.95);
-        }
-
-            .results-container ul {
-                list-style: none;
-                padding: 0;
-            }
-
-            .results-container li {
-                padding: 12px;
-                border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-                cursor: pointer;
-                transition: background 0.3s ease;
-            }
-
-                .results-container li:hover {
-                    background: rgba(52, 152, 219, 0.1);
-                }
-
-            .results-container a {
-                color: var(--secondary-color);
-                text-decoration: none;
-                margin-left: 10px;
-                font-weight: 600;
-            }
-
-                .results-container a:hover {
-                    text-decoration: underline;
-                }
-
-        /* Dettagli impianto */
-        #impiantoDetails {
-            margin-top: 20px;
-        }
-
-        .placeholder {
-            color: #888;
-            font-style: italic;
-        }
-
-        /* Container documenti */
-        .documenti-container {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(232, 245, 233, 0.9);
-            border: 1px solid #c8e6c9;
-            border-radius: 6px;
-            border-left: 4px solid var(--secondary-color);
-        }
-
-            .documenti-container h4 {
-                color: var(--primary-color);
-                margin-bottom: 10px;
-            }
-
-            .documenti-container a {
-                color: var(--secondary-color);
-                text-decoration: none;
-                font-weight: 600;
-            }
-
-                .documenti-container a:hover {
-                    text-decoration: underline;
-                }
-
-        /* Container annotazioni */
-        .annotazioni-container {
-            margin-top: 20px;
-            padding: 15px;
-            background: rgba(232, 245, 233, 0.9);
-            border-radius: 6px;
-            border-left: 4px solid var(--info-color);
-        }
-
-        .annotazioni-list {
-            margin-top: 10px;
-        }
-
-        .annotazione-item {
-            padding: 10px;
-            margin-bottom: 10px;
-            border-bottom: 1px solid rgba(0,0,0,0.1);
-            background: rgba(255, 255, 255, 0.8);
-            border-radius: 4px;
-            transition: background 0.3s ease;
-        }
-
-            .annotazione-item:hover {
-                background: rgba(139, 195, 74, 0.1);
-            }
-
-            .annotazione-item:last-child {
-                border-bottom: none;
-            }
-
-        .annotazione-header {
+            margin-bottom: 15px;
+            background: #fff;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9rem;
             display: flex;
-            justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
         }
 
-        .tecnico {
-            font-size: 0.9em;
-            color: #666;
-            background: rgba(76, 175, 80, 0.1);
-            padding: 4px 10px;
-            border-radius: 12px;
-            font-weight: 500;
+        .status-loading {
+            color: #e67e22;
         }
 
-        .annotazione-note {
-            font-size: 0.95em;
-            color: #333;
-            padding-left: 15px;
-            border-left: 3px solid #e0e0e0;
-            line-height: 1.5;
+        .status-ready {
+            color: var(--primary-color);
         }
 
-        .badge-tipo {
+        .status-error {
+            color: #d32f2f;
+        }
+
+        /* Loader Animation */
+        .loader {
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #3498db;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* --- RISULTATI RICERCA --- */
+        .results-container {
+            max-height: 400px;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-top: 15px;
+        }
+
+        .result-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: #fff;
+        }
+
+            .result-item:active {
+                background-color: #e8f5e9;
+            }
+
+        .btn-dettagli {
             display: inline-block;
-            padding: 3px 8px;
+            margin-left: 10px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
             border-radius: 4px;
-            font-size: 0.85em;
-            font-weight: 600;
-            margin-right: 8px;
+            text-decoration: none;
+            font-size: 0.8rem;
+        }
+
+        /* --- DETTAGLI SCHEDA --- */
+        .scheda-item p {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .scheda-item strong {
+            color: #444;
+        }
+
+        /* Badge annotazioni */
+        .badge-tipo {
+            font-size: 0.75rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            text-transform: uppercase;
         }
 
         .badge-semestrale {
-            background: rgba(46, 125, 50, 0.2);
-            color: #1b5e20;
-        }
-
-        .badge-appuntamento {
-            background: rgba(76, 175, 80, 0.2);
+            background: #e8f5e9;
             color: #2e7d32;
         }
 
+        .badge-appuntamento {
+            background: #e3f2fd;
+            color: #1565c0;
+        }
+
         .badge-manutenzione {
-            background: rgba(139, 195, 74, 0.2);
-            color: #558b2f;
+            background: #fff3e0;
+            color: #ef6c00;
         }
 
-        /* Ricerche recenti */
-        .recent-searches-container {
-            margin-top: 30px;
-            padding: 20px;
-            background: rgba(232, 245, 233, 0.9);
-            border-radius: 6px;
-            border-left: 4px solid var(--warning-color);
-        }
-
-        #recentSearches {
-            list-style: none;
-            padding: 0;
-        }
-
-            #recentSearches li {
-                padding: 8px 12px;
-                margin-bottom: 5px;
-                background: rgba(255, 255, 255, 0.7);
-                border-radius: 4px;
-                cursor: pointer;
-                transition: background 0.3s ease;
-            }
-
-                #recentSearches li:hover {
-                    background: rgba(76, 175, 80, 0.1);
-                }
-
-        /* Footer */
-        .footer {
-            background: rgba(0, 0, 0, 0.8);
-            color: var(--light-text);
-            padding: 15px;
-            text-align: center;
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            font-size: 14px;
-            font-style: italic;
-            z-index: 1000;
-        }
-
-            .footer p {
-                margin: 0;
-            }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .row {
-                flex-direction: column;
-            }
-
-            .column {
-                width: 100%;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            h2 {
-                font-size: 1.5rem;
-            }
-
-            .annotazione-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-
-            .tecnico {
-                align-self: flex-start;
-            }
-        }
-
-        /* Animazioni */
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .results-container li {
-            animation: fadeIn 0.5s ease forwards;
-            opacity: 0;
-        }
-
-        /* Scrollbar personalizzata */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.1);
-        }
-
-        ::-webkit-scrollbar-thumb {
-            background: var(--secondary-color);
-            border-radius: 4px;
-        }
-
-            ::-webkit-scrollbar-thumb:hover {
-                background: var(--primary-color);
-            }
-
-        /* Stile per i filtri */
-        .filters {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 20px;
-        }
-
-        /* Stile per l'elenco impianti */
-        .impianto-item {
+        .annotazione-item {
+            background: #f9f9f9;
             padding: 10px;
             margin-bottom: 10px;
             border-radius: 6px;
-            background: rgba(255, 255, 255, 0.9);
-            box-shadow: var(--shadow);
+            border-left: 3px solid var(--secondary-color);
         }
 
-            .impianto-item.semestrale-scaduta {
-                background: rgba(231, 76, 60, 0.1);
-                border-left: 4px solid #e74c3c;
-            }
-
-            .impianto-item.mese-diverso {
-                background: rgba(241, 196, 15, 0.1);
-                border-left: 4px solid #f1c40f;
-            }
-
-            .impianto-item.eseguita {
-                background: rgba(46, 204, 113, 0.1);
-                border-left: 4px solid #2ecc71;
-            }
-
-        .stato {
-            float: right;
-            font-weight: bold;
+        /* Footer fisso mobile */
+        .footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #333;
+            color: #fff;
+            text-align: center;
+            padding: 8px;
+            font-size: 0.7rem;
+            z-index: 1000;
         }
-
-        /* Statistiche */
-        #statistiche {
-            margin-top: 20px;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.9);
-            border-radius: 6px;
-            box-shadow: var(--shadow);
-        }
-
-        #carica-file {
-            background: var(--secondary-color);
-            color: var(--light-text);
-            border: none;
-            border-radius: 6px;
-            padding: 10px 20px;
-            cursor: pointer;
-            font-size: 16px;
-            transition: background 0.3s ease;
-        }
-
-            #carica-file:hover {
-                background: var(--primary-color);
-            }
-
-/* Rimuove i pallini dalla lista commesse e altre liste nei dettagli */
-#listaCommesse, .annotazioni-list {
-    list-style-type: none;
-    padding-left: 0;
-}
-
-/* Stile specifico per il box Archivio per renderlo più "pulito" */
-.archivio-item {
-    padding: 12px;
-    margin-bottom: 10px;
-    background: #fffde7;
-    border-left: 4px solid var(--warning-color);
-    border-radius: 0 6px 6px 0;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-    font-size: 0.95rem;
-    line-height: 1.6;
-}
-
     </style>
 </head>
 <body>
+
     <div class="container">
-        <h1>Ricerca Impianti</h1>
-        <div class="row">
-            <div class="column search-column">
+        <h1>🔍 Ricerca Impianti</h1>
+
+        <div id="status-bar" class="status-loading">
+            <div class="loader"></div>
+            <span>Connessione al Database in corso...</span>
+        </div>
+
+        <div class="column">
+            <form id="searchForm">
                 <div class="form-group">
-                    <label for="uploadExcel">Carica un file DataBase Excel</label>
-                    <input type="file" id="uploadExcel" accept=".xlsx, .xls" />
+                    <label for="query">Cerca Impianto / Indirizzo:</label>
+                    <input type="text" id="query" name="query" placeholder="Es. 1234 o Via Roma" autocomplete="off">
                 </div>
-                <form id="searchForm">
-                    <div class="form-group">
-                        <label for="zona">Zona:</label>
-                        <select id="zona" name="zona">
-                            <option value="" disabled selected>Seleziona una zona</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="query">Cerca per Codice Impianto o Indirizzo:</label>
-                        <input type="text" id="query" name="query" minlength="4" placeholder="Inserisci almeno 4 caratteri">
-                    </div>
-                    <button type="submit" class="btn">Cerca</button>
-                </form>
-                <div id="results" class="results-container"></div>
-            </div>
-            <div class="column details-column">
-                <h2>Scheda Impianto</h2>
-                <div id="impiantoDetails">
-                    <p class="placeholder">Seleziona un impianto dai risultati per vedere i dettagli.</p>
-                </div>
-            </div>
+                <button type="submit" class="btn">CERCA</button>
+            </form>
+            <div id="results" class="results-container"></div>
         </div>
 
-        <!-- DEBUG (opzionale) -->
-        <!--
-        <div id="debugInfo" style="display: none;">
-            <div class="debug-title">Debug Info:</div>
-            <div id="debugContent"></div>
-        </div>
-        -->
-
-        <!-- Ricerche recenti -->
-        <div class="recent-searches-container">
-            <h3>Ultime 10 ricerche</h3>
-            <ul id="recentSearches"></ul>
+        <div class="column" id="dettagli-container" style="display:none;">
+            <h2>Scheda Impianto</h2>
+            <div id="impiantoDetails" class="scheda-item">
+            </div>
+            <button onclick="document.getElementById('dettagli-container').style.display='none'; window.scrollTo(0,0);" class="btn" style="margin-top:20px; background:#666;">CHIUDI SCHEDA</button>
         </div>
     </div>
 
+    <div class="footer">
+        <p>App Mobile v1.0 - Database GitHub</p>
+    </div>
+
     <script>
+        // --- CONFIGURAZIONE ---
+        // INSERISCI QUI IL LINK "RAW" DEL TUO FILE EXCEL SU GITHUB
+        // Esempio: 'https://raw.githubusercontent.com/TUO_NOME/TUO_REPO/main/DATABASE.xlsx'
+        const GITHUB_EXCEL_URL = 'https://raw.githubusercontent.com/UTENTE/REPOSITORY/main/NOME_FILE.xlsx';
+
         let data = [];
         let elencoData = [];
         let m28Data = [];
         let annotazioniData = [];
-        let archivioData = []; // <--- Aggiungi questa riga
+        let archivioData = [];
         let mappature = { commerciali: {}, giri: {} };
+        let dbCaricato = false;
 
-        // Funzione per aggiornare il Debug nel footer
-        function aggiungiDebugInfo(messaggio) {
-            if (typeof messaggio !== 'string' || messaggio.trim() === '') {
-                console.error("Messaggio di debug non valido o vuoto.");
+        // --- CARICAMENTO DATI ALL'AVVIO ---
+        window.onload = function() {
+            caricaDatabase();
+        };
+
+        async function caricaDatabase() {
+            const statusBar = document.getElementById('status-bar');
+
+            // Verifica se l'URL è stato configurato
+            if (GITHUB_EXCEL_URL.includes('UTENTE/REPOSITORY')) {
+                statusBar.innerHTML = '<span class="status-error">⚠️ ERRORE: URL Database non configurato nel codice!</span>';
                 return;
             }
 
-            const debugInfo = document.getElementById('debugInfo');
-            if (!debugInfo) return;
+            try {
+                // Aggiungiamo un timestamp per evitare che il browser usi una versione vecchia (cache)
+                const urlNoCache = GITHUB_EXCEL_URL + '?t=' + new Date().getTime();
 
-            const nuovoMessaggio = document.createElement('p');
-            const timestamp = new Date().toLocaleTimeString();
-            nuovoMessaggio.textContent = `[${timestamp}] ${messaggio}`;
-            debugInfo.appendChild(nuovoMessaggio);
+                const response = await fetch(urlNoCache);
+                if (!response.ok) throw new Error("Impossibile scaricare il file");
 
-            const maxMessaggi = 50;
-            while (debugInfo.children.length > maxMessaggi) {
-                debugInfo.removeChild(debugInfo.firstChild);
+                const arrayBuffer = await response.arrayBuffer();
+                const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+
+                // Processa i fogli (stessa logica del vecchio script)
+                parseWorkbook(workbook);
+
+                dbCaricato = true;
+                statusBar.innerHTML = '<span class="status-ready">✅ Database aggiornato e pronto!</span>';
+                statusBar.className = 'status-ready';
+
+            } catch (error) {
+                console.error(error);
+                statusBar.innerHTML = `<span class="status-error">❌ Errore caricamento: ${error.message}</span>`;
             }
         }
 
-        // Caricamento e parsing del file Excel
-        document.getElementById('uploadExcel').addEventListener('change', function (e) {
-            const file = e.target.files[0];
-
-            if (file) {
-                const lastModifiedDate = new Date(file.lastModified);
-                aggiungiDebugInfo(`Ultimo aggiornamento file: ${lastModifiedDate.toLocaleString()}`);
+        function parseWorkbook(workbook) {
+            // Foglio PARCO
+            if (workbook.Sheets["PARCO"]) {
+                data = XLSX.utils.sheet_to_json(workbook.Sheets["PARCO"]);
             }
-
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                const workbook = XLSX.read(e.target.result, { type: 'binary' });
-                const sheetNames = workbook.SheetNames;
-                aggiungiDebugInfo(`Fogli caricati: ${sheetNames.join(', ')}`);
-
-                // Carica foglio PARCO
-                const parcoSheetName = workbook.SheetNames.find(name => name === "PARCO");
-                if (!parcoSheetName) {
-                    aggiungiDebugInfo("Foglio 'PARCO' non trovato!");
-                    console.error("Foglio 'PARCO' non trovato!");
-                    return;
-                }
-                const parcoSheet = workbook.Sheets[parcoSheetName];
-                data = XLSX.utils.sheet_to_json(parcoSheet);
-                aggiungiDebugInfo(`Foglio PARCO caricato con ${data.length} righe trovate.`);
-
-                // Popola dropdown zone
-                const zone = [...new Set(data.map(item => item.zona))];
-                const zonaSelect = document.getElementById('zona');
-                zonaSelect.innerHTML = '<option value="" disabled selected>Seleziona una zona</option>';
-                zone.forEach(zona => {
-                    const option = document.createElement('option');
-                    option.value = zona;
-                    option.textContent = zona;
-                    zonaSelect.appendChild(option);
+            // Foglio M28
+            if (workbook.Sheets["M28"]) {
+                m28Data = XLSX.utils.sheet_to_json(workbook.Sheets["M28"]);
+            }
+            // Foglio ELENCO
+            if (workbook.Sheets["ELENCO"]) {
+                elencoData = XLSX.utils.sheet_to_json(workbook.Sheets["ELENCO"]);
+            }
+            // Foglio ANNOTAZIONI
+            if (workbook.Sheets["ANNOTAZIONI"]) {
+                annotazioniData = XLSX.utils.sheet_to_json(workbook.Sheets["ANNOTAZIONI"]);
+            }
+             // Foglio ARCHIVIO
+            if (workbook.Sheets["ARCHIVIO"]) {
+                archivioData = XLSX.utils.sheet_to_json(workbook.Sheets["ARCHIVIO"]);
+            }
+            // Mappature
+            if (workbook.Sheets["MAPPATURE"]) {
+                const mapData = XLSX.utils.sheet_to_json(workbook.Sheets["MAPPATURE"]);
+                mapData.forEach(row => {
+                    if (row.Tipo === 'COMMERCIALE') mappature.commerciali[row.Codice] = row.Nome;
+                    else if (row.Tipo === 'GIRO') mappature.giri[row.Codice] = row.Nome;
                 });
+            }
+        }
 
-                // Carica foglio M28
-                const m28SheetName = workbook.SheetNames.find(name => name === "M28");
-                if (!m28SheetName) {
-                    aggiungiDebugInfo("Foglio 'M28' non trovato!");
-                    console.error("Foglio 'M28' non trovato!");
-                } else {
-                    const m28Sheet = workbook.Sheets[m28SheetName];
-                    m28Data = XLSX.utils.sheet_to_json(m28Sheet);
-                    aggiungiDebugInfo(`Foglio M28 caricato con ${m28Data.length} righe trovate.`);
-                }
-
-                // Carica foglio MAPPATURE
-                const mappatureSheetName = workbook.SheetNames.find(name => name === "MAPPATURE");
-                if (mappatureSheetName) {
-                    const mappatureSheet = workbook.Sheets[mappatureSheetName];
-                    const mappatureData = XLSX.utils.sheet_to_json(mappatureSheet);
-
-                    mappatureData.forEach(row => {
-                        if (row.Tipo === 'COMMERCIALE') {
-                            mappature.commerciali[row.Codice] = row.Nome;
-                        } else if (row.Tipo === 'GIRO') {
-                            mappature.giri[row.Codice] = row.Nome;
-                        }
-                    });
-                    console.log("Mappature caricate:", mappature);
-                }
-
-                // Carica foglio ELENCO
-                const elencoSheetName = workbook.SheetNames.find(name => name === "ELENCO");
-                if (!elencoSheetName) {
-                    aggiungiDebugInfo("Foglio 'ELENCO' non trovato!");
-                    console.error("Foglio 'ELENCO' non trovato!");
-                } else {
-                    const elencoSheet = workbook.Sheets[elencoSheetName];
-                    elencoData = XLSX.utils.sheet_to_json(elencoSheet);
-                    aggiungiDebugInfo(`Foglio ELENCO caricato con ${elencoData.length} righe trovate.`);
-                }
-
-                // CARICA FOGLIO ANNOTAZIONI
-                const annotazioniSheetName = workbook.SheetNames.find(name => name === "ANNOTAZIONI");
-                if (!annotazioniSheetName) {
-                    aggiungiDebugInfo("Foglio 'ANNOTAZIONI' non trovato!");
-                    console.warn("Foglio 'ANNOTAZIONI' non trovato!");
-                } else {
-                    const annotazioniSheet = workbook.Sheets[annotazioniSheetName];
-                    annotazioniData = XLSX.utils.sheet_to_json(annotazioniSheet);
-                    aggiungiDebugInfo(`Foglio ANNOTAZIONI caricato con ${annotazioniData.length} righe trovate.`);
-                }
-
-                // --- AGGIUNGI DA QUI ---
-                // CARICA FOGLIO ARCHIVIO
-                const archivioSheetName = workbook.SheetNames.find(name => name === "ARCHIVIO");
-                if (!archivioSheetName) {
-                    aggiungiDebugInfo("Foglio 'ARCHIVIO' non trovato!");
-                } else {
-                    const archivioSheet = workbook.Sheets[archivioSheetName];
-                    archivioData = XLSX.utils.sheet_to_json(archivioSheet);
-                    aggiungiDebugInfo(`Foglio ARCHIVIO caricato con ${archivioData.length} righe.`);
-                }
-                // --- A QUI ---
-
-                // Debug finale
-                aggiungiDebugInfo(`File analizzato: PARCO (${data.length} righe), ELENCO (${elencoData.length} righe), ANNOTAZIONI (${annotazioniData ? annotazioniData.length : 0} righe).`);
-            };
-            reader.readAsBinaryString(file);
-
-   // Aggiungi questo blocco dopo il caricamento degli altri fogli
-   const archivioSheetName = workbook.SheetNames.find(name => name === "ARCHIVIO");
-   if (!archivioSheetName) {
-    aggiungiDebugInfo("Foglio 'ARCHIVIO' non trovato!");
-   } else {
-    const archivioSheet = workbook.Sheets[archivioSheetName];
-    archivioData = XLSX.utils.sheet_to_json(archivioSheet);
-    aggiungiDebugInfo(`Foglio ARCHIVIO caricato con ${archivioData.length} righe.`);
-   }
-
-
-        });
-
-        // Gestione della ricerca
+        // --- GESTIONE RICERCA ---
         document.getElementById('searchForm').addEventListener('submit', function (e) {
             e.preventDefault();
-            const zona = document.getElementById('zona').value;
-            const query = document.getElementById('query').value.toLowerCase();
-
-            // Filtra i dati
-            const results = data.filter(item => {
-                return item.zona == zona && (
-                    item.impianto.toLowerCase().includes(query) ||
-                    item['Indirizzo impianto'].toLowerCase().includes(query)
-                );
-            });
-
-            // Mostra i risultati
-            const resultsDiv = document.getElementById('results');
-            if (results.length === 0) {
-                resultsDiv.innerHTML = '<p>Nessun risultato trovato.</p>';
+            if (!dbCaricato) {
+                alert("Il database non è ancora caricato. Attendi...");
                 return;
             }
 
-            resultsDiv.innerHTML = '<h2>Risultati:</h2><ul>';
-            results.forEach(item => {
-                const giroText = (item.giro == 77 || item.giro == 88 || item.giro == 99)
-                    ? `<strong style="color: red;">DISDETTA</strong>`
-                    : item.giro || 'N/A';
+            const query = document.getElementById('query').value.toLowerCase().trim();
+            if (query.length < 3) {
+                alert("Inserisci almeno 3 caratteri per cercare.");
+                return;
+            }
 
-                resultsDiv.innerHTML += `
-                    <p><strong>${item.impianto}</strong> MATR. ${item.matricola || 'N/A'}</p>
-                    <p>${item['Indirizzo impianto']} ${item['Località impianto'] || ''} - <strong>${item.venditore || 'N/A'} - ${giroText}</strong>
-                    <a href="#" class="view-details" data-impianto="${item.impianto}">📋</a></p>
-                    <hr style="border: 0; height: 1px; background: #ccc; margin: 20px 0;">
-                `;
+            // Filtra i dati (Senza zona)
+            const results = data.filter(item => {
+                const imp = String(item.impianto || '').toLowerCase();
+                const ind = String(item['Indirizzo impianto'] || '').toLowerCase();
+                return imp.includes(query) || ind.includes(query);
             });
-            resultsDiv.innerHTML += '</ul>';
 
-            document.querySelectorAll('.view-details').forEach(link => {
-                link.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const impianto = this.getAttribute('data-impianto');
-                    const selected = data.find(item => item.impianto === impianto);
-                    if (selected) {
-                        showImpiantoDetails(selected);
-                    } else {
-                        console.error("Impianto non trovato:", impianto);
-                    }
-                });
-            });
+            mostraRisultati(results);
         });
 
-        // Funzioni per la gestione delle date
+        function mostraRisultati(results) {
+            const container = document.getElementById('results');
+            document.getElementById('dettagli-container').style.display = 'none'; // Nascondi dettagli se aperti
+
+            if (results.length === 0) {
+                container.innerHTML = '<div style="padding:15px; text-align:center;">Nessun risultato trovato.</div>';
+                return;
+            }
+
+            let html = '';
+            results.slice(0, 50).forEach(item => { // Limito a 50 risultati per performance mobile
+                const giroText = (item.giro == 77 || item.giro == 88 || item.giro == 99)
+                    ? `<span style="color:red; font-weight:bold;">DISDETTA</span>`
+                    : (mappature.giri[item.giro] || item.giro || 'N/A');
+
+                html += `
+                <div class="result-item" onclick="apriDettaglio('${item.impianto}')">
+                    <div style="font-weight:bold; font-size:1.1rem; margin-bottom:4px;">${item.impianto} <span style="font-weight:normal; font-size:0.9rem; color:#666;">(Matr. ${item.matricola || '-'})</span></div>
+                    <div style="font-size:0.95rem; margin-bottom:4px;">📍 ${item['Indirizzo impianto']}</div>
+                    <div style="font-size:0.85rem; color:#555;">👤 ${item.venditore || 'N/D'} | 🔄 ${giroText}</div>
+                    <div style="margin-top:8px; text-align:right;">
+                        <span style="color:var(--secondary-color); font-weight:bold; font-size:0.9rem;">Tocca per dettagli ></span>
+                    </div>
+                </div>`;
+            });
+            container.innerHTML = html;
+        }
+
+        function apriDettaglio(codiceImpianto) {
+            const item = data.find(x => x.impianto == codiceImpianto);
+            if (!item) return;
+
+            showImpiantoDetails(item);
+
+            // UI Mobile: Mostra il div dettagli e scrolla giù
+            const detContainer = document.getElementById('dettagli-container');
+            detContainer.style.display = 'block';
+            detContainer.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // --- FUNZIONI DI FORMATTAZIONE E RENDER (Adattate dal vecchio codice) ---
         function excelDateToJSDate(excelDate) {
+            if(!excelDate) return null;
             return new Date(Math.round((excelDate - 25569) * 86400 * 1000));
         }
 
         function formatData(excelDate) {
             if (!excelDate) return 'N/A';
             const jsDate = excelDateToJSDate(excelDate);
-            const giorno = String(jsDate.getDate()).padStart(2, '0');
-            const mese = String(jsDate.getMonth() + 1).padStart(2, '0');
-            const anno = jsDate.getFullYear();
-            return `${giorno}-${mese}-${anno}`;
+            if(!jsDate) return 'N/A';
+            const g = String(jsDate.getDate()).padStart(2, '0');
+            const m = String(jsDate.getMonth() + 1).padStart(2, '0');
+            const a = jsDate.getFullYear();
+            return `${g}-${m}-${a}`;
         }
 
-        function formatDateToDDMMYYYY(excelDate) {
-            if (!excelDate) return 'N/A';
-            const date = new Date((excelDate - 25569) * 86400 * 1000);
-            const giorno = String(date.getDate()).padStart(2, '0');
-            const mese = String(date.getMonth() + 1).padStart(2, '0');
-            const anno = date.getFullYear();
-            return `${giorno}/${mese}/${anno}`;
-        }
-
-        // Funzione per mostrare commesse
-        function mostraCommessePerImpianto(impianto) {
-            const lista = document.getElementById('listaCommesse');
-            lista.innerHTML = '';
-
-            const commesseImpianto = m28Data.filter(commessa => commessa["ID Imp."] == impianto.impianto);
-
-            if (commesseImpianto.length === 0) {
-                lista.innerHTML = '<li>Nessuna commessa trovata per questo impianto.</li>';
-            } else {
-                commesseImpianto.forEach(commessa => {
-                    const numeroCommessa = commessa["Numero Commessa"] || 'N/A';
-                    const dataCommessa = formatDateToDDMMYYYY(commessa["Data commessa"]) || 'N/A';
-                    const statoComm = commessa["Stato comm."] || 'N/A';
-                    const tipo = commessa["Tipo"] || 'N/A';
-                    const commessaJSON = encodeURIComponent(JSON.stringify(commessa));
-                    const linkIcon = `<a href="commesse.html?commessa=${commessaJSON}" target="_blank" title="Visualizza dettagli commessa">🔨</a>`;
-                    const liHTML = `<li>${numeroCommessa} - ${dataCommessa} - ${statoComm} - ${tipo}&nbsp;${linkIcon}</li>`;
-                    lista.innerHTML += liHTML;
-                });
-            }
-        }
-
-        // Funzione helper per formattare codice + nome
-        function formatWithMapping(value, mapping) {
-            if (!value) return 'N/A';
-            const mappedValue = mapping[value];
-            if (mappedValue) {
-                return `${value} - ${mappedValue}`;
-            }
-            return value;
-        }
-
-        // Funzione per ottenere documenti per impianto
-        function getDocumentiPerImpianto(impianto) {
-            if (!elencoData || !Array.isArray(elencoData)) {
-                console.error("Dati ELENCO non caricati correttamente!");
-                return [];
-            }
-            return elencoData.filter(item => item.IMPIANTO === impianto);
-        }
-
-        // FUNZIONI PER LE ANNOTAZIONI
-        function getUltimeAnnotazioni(impiantoCodice, limite = 5) {
-            if (!annotazioniData || annotazioniData.length === 0) {
-                return [];
-            }
-            
-            const oggi = new Date();
-            const unAnnoFa = new Date();
-            unAnnoFa.setFullYear(oggi.getFullYear() - 1);
-            
-            return annotazioniData
-                .filter(ann => {
-                    // Filtra per impianto
-                    if (ann.impianto_ann != impiantoCodice) return false;
-                    
-                    // Filtra per data (ultimo anno)
-                    if (!ann.anno_ann || !ann.mese_ann || !ann.giorno_ann) return false;
-                    
-                    const dataAnnotazione = new Date(ann.anno_ann, ann.mese_ann - 1, ann.giorno_ann);
-                    return dataAnnotazione >= unAnnoFa;
-                })
-                .sort((a, b) => {
-                    // Ordina dalla più recente alla più vecchia
-                    const dateA = new Date(a.anno_ann, a.mese_ann - 1, a.giorno_ann);
-                    const dateB = new Date(b.anno_ann, b.mese_ann - 1, b.giorno_ann);
-                    return dateB - dateA;
-                })
-                .slice(0, limite);
-        }
-
-        function formattaTipoAnnotazione(tipoNumero) {
-            const tipi = {
-                0: 'Semestrale',
-                1: 'Appuntamento', 
-                2: 'Nota di Manutenzione'
-            };
-            return tipi[tipoNumero] || `Tipo ${tipoNumero}`;
-        }
-
-        function getClasseBadgeTipo(tipoNumero) {
-            const classi = {
-                0: 'badge-semestrale',
-                1: 'badge-appuntamento',
-                2: 'badge-manutenzione'
-            };
-            return classi[tipoNumero] || '';
-        }
-
-        function formattaDataAnnotazione(giorno, mese, anno) {
-            const mesi = [
-                'Gennaio', 'Febbraio', 'Marzo', 'Aprile', 'Maggio', 'Giugno',
-                'Luglio', 'Agosto', 'Settembre', 'Ottobre', 'Novembre', 'Dicembre'
-            ];
-            
-            const meseTestuale = mesi[parseInt(mese) - 1] || mese;
-            return `${giorno}-${meseTestuale}-${anno}`;
-        }
-
-        function mostraUltimeAnnotazioni(impiantoCodice) {
-            const annotazioni = getUltimeAnnotazioni(impiantoCodice, 5);
-            
-            if (annotazioni.length === 0) {
-                return '<p class="placeholder">Nessuna annotazione registrata nell\'ultimo anno.</p>';
-            }
-            
-            let html = '<div class="annotazioni-list">';
-            
-            annotazioni.forEach(ann => {
-                const dataFormattata = formattaDataAnnotazione(
-                    ann.giorno_ann, 
-                    ann.mese_ann, 
-                    ann.anno_ann
-                );
-                
-                const tipoFormattato = formattaTipoAnnotazione(ann.tipo);
-                const classeBadge = getClasseBadgeTipo(ann.tipo);
-                
-                html += `
-                    <div class="annotazione-item">
-                        <div class="annotazione-header">
-                            <div>
-                                <span class="badge-tipo ${classeBadge}">${tipoFormattato}</span>
-                                <strong>${dataFormattata}</strong>
-                            </div>
-                            <span class="tecnico">👨‍🔧 ${ann.tecnico_ann || 'N/D'}</span>
-                        </div>
-                        <div class="annotazione-note">
-                            ${ann.note || '<i>Nessuna nota specificata</i>'}
-                        </div>
-                    </div>
-                `;
-            });
-            
-            html += '</div>';
-            return html;
-        }
-
-        // Funzione principale per mostrare i dettagli dell'impianto
-        function showImpiantoDetails(impianto) {
-            console.log("Dati dell'impianto:", impianto);
-
-            const detailsDiv = document.getElementById('impiantoDetails');
-            if (!detailsDiv) {
-                console.error("Elemento #impiantoDetails non trovato!");
-                return;
-            }
-
+        function showImpiantoDetails(imp) {
+            const div = document.getElementById('impiantoDetails');
             const oggi = new Date();
 
-            // Formatta i dati commerciali e giro
-            const commerciale = formatWithMapping(impianto['venditore'], mappature.commerciali);
-            const giro = formatWithMapping(impianto.giro, mappature.giri);
+            // Calcoli date
+            const dataSem = excelDateToJSDate(imp['ult sem']);
+            const diffSem = dataSem ? Math.floor((oggi - dataSem) / (86400000)) : 0;
+            const styleSem = diffSem > 180 ? 'color:red; font-weight:bold;' : '';
 
-            // Converti le date
-            const ultSemDate = excelDateToJSDate(new Date(impianto['ult sem']));
-            const ultVpDate = excelDateToJSDate(new Date(impianto['utl vp']));
-
-            // Calcola differenze in giorni
-            const diffUltSem = Math.floor((oggi - ultSemDate) / (1000 * 60 * 60 * 24));
-            const diffUltVp = Math.floor((oggi - ultVpDate) / (1000 * 60 * 60 * 24));
-
-            // Formatta date con evidenziazione
-            const ultSemFormattato = diffUltSem > 180
-                ? `<strong style="color: red;">${formatData(impianto['ult sem'])} [${diffUltSem} giorni]</strong>`
-                : `${formatData(impianto['ult sem'])} [${diffUltSem} giorni]` || 'N/A';
-            const ultVpFormattato = diffUltVp > 730
-                ? `<strong style="color: red;">${formatData(impianto['utl vp'])} [${diffUltVp} giorni]</strong>`
-                : `${formatData(impianto['utl vp'])} [${diffUltVp} giorni]` || 'N/A';
-
-            // Calcolo mese semestrale
-            const meseSemestrale = impianto['mese sem'];
-            const mesi = ["Gennaio", "Febbraio", "Marzo", "Aprile", "Maggio", "Giugno", "Luglio", "Agosto", "Settembre", "Ottobre", "Novembre", "Dicembre"];
-            const meseSemestraleCorretto = mesi[meseSemestrale - 1];
-            const meseSemestralePrecedente = (meseSemestrale - 6 <= 0) ? mesi[(meseSemestrale + 6 - 1)] : mesi[(meseSemestrale - 6 - 1)];
-            const meseSemestraleTesto = `${meseSemestralePrecedente} - ${meseSemestraleCorretto}`;
-
-            // Documenti
-            const documenti = getDocumentiPerImpianto(impianto.impianto);
-            const documentiHTML = documenti.map(doc => `
-                <a href="https://otiselevatoreur.sharepoint.com/:f:/r/teams/ESABologna/Shared%20Documents/General/Uff_Tecnico/KING/PROGETTO%20VERBALI/VERBALO_DOWN_ARXC/${doc['NOME FILE']}" target="_blank">${doc['NOME FILE']}</a>
-            `).join('<br>');
+            const dataVp = excelDateToJSDate(imp['utl vp']);
+            const diffVp = dataVp ? Math.floor((oggi - dataVp) / (86400000)) : 0;
+            const styleVp = diffVp > 730 ? 'color:red; font-weight:bold;' : '';
 
             // Annotazioni
-            const annotazioniHTML = mostraUltimeAnnotazioni(impianto.impianto);
+            const annotazioni = annotazioniData.filter(a => a.impianto_ann == imp.impianto)
+                .sort((a,b) => (b.anno_ann - a.anno_ann) || (b.mese_ann - a.mese_ann) || (b.giorno_ann - a.giorno_ann))
+                .slice(0, 3);
 
-            // Codifica dati per scheda completa
-            const datiImpiantoJSON = encodeURIComponent(JSON.stringify(impianto));
-         // LOGICA ARCHIVIO CORRETTA
-const codImpianto = String(impianto.impianto).trim();
-const recordsArchivio = archivioData.filter(r => {
-    const esa = String(r['N°IMPIANTO ESA'] || '').trim();
-    return esa === codImpianto || esa === codImpianto.replace(/^0+/, '');
-});
-
-let htmlArchivio = recordsArchivio.length ? recordsArchivio.map(r => `
-    <div class="annotazione-item" style="border-left: 4px solid var(--warning-color); background: #fffde7;">
-        <div class="annotazione-header">
-            <strong>N° PRATICA: ${r['N°  PRATICA ARCHIVIO'] || 'N/D'}</strong>
-        </div>
-        <div class="annotazione-note">
-            <span>Richiesta: <b>${r['DOC RICHIESTI'] || 'N/D'}</b> il ${formatData(r['Column12'])}</span><br>
-            <span>Consegna: <b>${r['DOCS PER CLIENTE CONSEGNATI'] || 'N/D'}</b> il ${formatData(r['Column17'])}</span>
-        </div>
-    </div>`).join('') : '<p class="placeholder">✅ Nessuna Dichiarazione presente</p>';
-            detailsDiv.innerHTML = `
-                <h3>${impianto.impianto} <a href="scheda_completa.html?impianto=${datiImpiantoJSON}" target="_blank" style="text-decoration: none;">📝</a></h3>
-                <p><strong>Matricola:</strong> ${impianto.matricola || 'N/A'}</p>
-                <p><strong>Indirizzo:</strong> ${impianto['Indirizzo impianto']}</p>
-                <p><strong>Località:</strong> ${impianto['Località impianto'] || 'N/A'}</p>
-                <p><strong>Commerciale:</strong> ${commerciale}</p>
-                <p><strong>Giro:</strong> ${giro}</p>
-                <p><strong>Mese Semestrale:</strong> ${meseSemestraleTesto}</p>
-                <p><strong>Ultima Semestrale:</strong> ${ultSemFormattato}</p>
-                <p><strong>Ultima Visita ENTE:</strong> ${ultVpFormattato}</p>
-                <p><strong>Manutenzione:</strong> ${impianto.manut || 'N/A'}</p>
-                <p><strong>Tipo Cliente:</strong> ${impianto['tipo cliente'] || 'N/A'}</p>
-                <p><strong>Cliente:</strong> ${impianto.Cliente || 'N/A'}</p>
-                <p><strong>Amministratore:</strong> ${impianto.Amministratore || 'N/A'}</p>
-                <p><strong>Note:</strong> ${impianto.note || 'N/A'}</p>
-                
-                <div class="annotazioni-container">
-                    <h4>📝 ULTIME ANNOTAZIONI (ultimo anno)</h4>
-                    ${annotazioniHTML}
-                </div>
-                
-                <div class="documenti-container">
-                    <h4>📄 VERBALI TROVATI (${documenti.length})</h4>
-                    ${documentiHTML || '<p class="placeholder">Nessun verbale trovato</p>'}
-                </div>
-                
-                <div class="documenti-container">
-                    <h4>🔧 COMMESSE PRESENTI</h4>
-                    <p id="listaCommesse"></p>
-                </div>
-
-
-<div class="annotazioni-container" style="border-left: 4px solid var(--warning-color); margin-top: 20px;">
-    <h4>📄 ARCHIVIO DC</h4>
-    ${htmlArchivio}
-</div>
-
-
-
-
-            `;
-
-            // Mostra le commesse
-            mostraCommessePerImpianto(impianto);
-        }
-
-        // Gestione ricerche recenti
-        const recentSearches = [];
-
-        function saveRecentSearch(zona, query) {
-            const searchEntry = { zona, query };
-            recentSearches.unshift(searchEntry);
-            if (recentSearches.length > 10) {
-                recentSearches.pop();
-            }
-            updateRecentSearches();
-        }
-
-        function updateRecentSearches() {
-            const recentSearchesList = document.getElementById('recentSearches');
-            recentSearchesList.innerHTML = '';
-
-            recentSearches.forEach((search, index) => {
-                const listItem = document.createElement('li');
-                listItem.textContent = `${search.zona} - ${search.query}`;
-                listItem.style.cursor = 'pointer';
-                listItem.addEventListener('click', () => {
-                    document.getElementById('zona').value = search.zona;
-                    document.getElementById('query').value = search.query;
-                    document.getElementById('searchForm').dispatchEvent(new Event('submit'));
+            let annHTML = '';
+            if(annotazioni.length > 0) {
+                annotazioni.forEach(ann => {
+                    const tipo = ann.tipo == 0 ? 'Semestrale' : (ann.tipo == 1 ? 'Appunt.' : 'Manut.');
+                    const classe = ann.tipo == 0 ? 'badge-semestrale' : (ann.tipo == 1 ? 'badge-appuntamento' : 'badge-manutenzione');
+                    annHTML += `
+                    <div class="annotazione-item">
+                        <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                            <span class="badge-tipo ${classe}">${tipo}</span>
+                            <span style="font-size:0.85rem; color:#666;">${ann.giorno_ann}/${ann.mese_ann}/${ann.anno_ann}</span>
+                        </div>
+                        <div style="font-size:0.9rem;">${ann.note || '-'}</div>
+                        <div style="font-size:0.8rem; color:#888; margin-top:3px; text-align:right;">Tecnico: ${ann.tecnico_ann || '?'}</div>
+                    </div>`;
                 });
-                recentSearchesList.appendChild(listItem);
-            });
-        }
-
-        // Modifica evento submit per salvare la ricerca
-        document.getElementById('searchForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            const zona = document.getElementById('zona').value;
-            const query = document.getElementById('query').value.toLowerCase();
-
-            if (zona && query.length >= 4) {
-                saveRecentSearch(zona, query);
+            } else {
+                annHTML = '<p style="font-style:italic; color:#888;">Nessuna annotazione recente.</p>';
             }
-        });
+
+            // Archivio
+            const codImpianto = String(imp.impianto).trim();
+            const docsArchivio = archivioData.filter(r => {
+                const esa = String(r['N°IMPIANTO ESA'] || '').trim();
+                return esa === codImpianto || esa === codImpianto.replace(/^0+/, '');
+            });
+            let archivioHTML = docsArchivio.length ? `<div style="background:#fffde7; padding:10px; border-left:4px solid #ff9800; font-size:0.9rem; margin-top:10px;">
+                <strong>📂 Archivio DC:</strong><br>
+                Pratica: ${docsArchivio[0]['N°  PRATICA ARCHIVIO'] || 'N/D'}<br>
+                Consegna: ${docsArchivio[0]['DOCS PER CLIENTE CONSEGNATI'] || 'No'}
+            </div>` : '';
+
+
+            // Render HTML
+            div.innerHTML = `
+                <p style="font-size:1.3rem; color:var(--primary-color); text-align:center;"><strong>${imp.impianto}</strong></p>
+                <p><strong>Indirizzo:</strong> ${imp['Indirizzo impianto']} ${imp['Località impianto'] || ''}</p>
+                <p><strong>Cliente:</strong> ${imp.Cliente || '-'}</p>
+                <p><strong>Amm.re:</strong> ${imp.Amministratore || '-'}</p>
+                <p><strong>Ultima Sem:</strong> <span style="${styleSem}">${formatData(imp['ult sem'])} (${diffSem}gg)</span></p>
+                <p><strong>Ultima VP:</strong> <span style="${styleVp}">${formatData(imp['utl vp'])} (${diffVp}gg)</span></p>
+                <p><strong>Giro:</strong> ${mappature.giri[imp.giro] || imp.giro || '-'}</p>
+                <p><strong>Note:</strong> ${imp.note || 'Nessuna'}</p>
+                ${archivioHTML}
+                <div style="margin-top:20px;">
+                    <h3>📝 Ultime Annotazioni</h3>
+                    ${annHTML}
+                </div>
+            `;
+        }
     </script>
 </body>
 </html>
