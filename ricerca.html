@@ -72,10 +72,20 @@
     };
 
     async function initDatabase() {
-        try {
-            const response = await fetch('database/DB.xlsx');
-            const arrayBuffer = await response.arrayBuffer();
-            const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+       try {
+        updateDebug("FETCHING...");
+        
+        // Usiamo un timestamp per evitare che GitHub Pages serva una versione vecchia (cache)
+        const dbPath = `database/DB.xlsx?v=${new Date().getTime()}`;
+        
+        const response = await fetch(dbPath);
+        
+        if (!response.ok) {
+            throw new Error(`File non trovato al percorso: ${dbPath}`);
+        }
+        
+        const arrayBuffer = await response.arrayBuffer();
+        const workbook = XLSX.read(arrayBuffer, { type: 'array' });
             
             db.parco = XLSX.utils.sheet_to_json(workbook.Sheets["PARCO"] || []);
             db.m28 = XLSX.utils.sheet_to_json(workbook.Sheets["M28"] || []);
@@ -93,9 +103,11 @@
             document.getElementById('dbStatusText').textContent = "PORTALE PRONTO";
             document.getElementById('dbStatusText').className = "text-emerald-400 font-bold";
             document.getElementById('debugStats').innerHTML = `Impianti: ${db.parco.length} | Commesse: ${db.commesse.length}`;
-        } catch (err) {
-            document.getElementById('dbStatusText').textContent = "ERRORE DB";
-        }
+      } catch (err) {
+        console.error("Errore Caricamento DB:", err);
+        updateDebug("ERRORE");
+        document.getElementById('debugStats').innerHTML = `<div class="text-red-400 text-[10px]">${err.message}</div>`;
+    }
     }
 
     document.getElementById('searchForm').addEventListener('submit', (e) => {
