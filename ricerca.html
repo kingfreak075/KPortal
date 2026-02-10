@@ -27,7 +27,7 @@
             </div>
 
             <div id="results" class="flex-1 overflow-y-auto pr-2 space-y-2 no-scrollbar pb-24 md:pb-4">
-                <div class="text-center py-20 text-slate-300 italic text-sm">In attesa del database...</div>
+                <div class="text-center py-20 text-slate-300 italic text-sm">Caricamento in corso...</div>
             </div>
         </div>
 
@@ -65,7 +65,9 @@
 </div>
 
 <script>
-    // 1. Definiamo la funzione updateDebug che mancava
+    /**
+     * FUNZIONE DI DEBUG (Deve essere definita per prima)
+     */
     function updateDebug(status, statsHtml = "") {
         const statusEl = document.getElementById('dbStatusText');
         const statsEl = document.getElementById('debugStats');
@@ -73,6 +75,9 @@
         if (statsEl) statsEl.innerHTML = statsHtml;
     }
 
+    /**
+     * VARIABILI GLOBALI
+     */
     var db = { parco: [], m28: [], mappature: { comm: {}, giri: {} }, archivio: [], verbali: [], annotazioni: [], commesse: [] };
 
     const excelToDate = (ed) => (ed && !isNaN(ed)) ? new Date(Math.round((ed - 25569) * 86400 * 1000)) : null;
@@ -82,13 +87,19 @@
         return Math.floor((new Date() - excelToDate(ed)) / (1000 * 60 * 60 * 24));
     };
 
+    /**
+     * CARICAMENTO DATABASE
+     */
     async function initDatabase() {
         try {
             updateDebug("FETCHING...");
-            // Usiamo ./ e assicurati che su GitHub i nomi siano corretti (cartella: database, file: DB.xlsx)
+            
+            // GitHub è case-sensitive: database (minuscolo) / DB.xlsx (maiuscolo)
             const response = await fetch('./database/DB.xlsx');
             
-            if (!response.ok) throw new Error(`HTTP ${response.status}: Database non trovato.`);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: Non trovo database/DB.xlsx`);
+            }
             
             updateDebug("PARSING...");
             const arrayBuffer = await response.arrayBuffer();
@@ -109,13 +120,16 @@
 
             updateDebug("PRONTO", `Impianti: ${db.parco.length} | Commesse: ${db.commesse.length}`);
             document.getElementById('dbStatusText').className = "text-emerald-400 font-bold";
-            document.getElementById('results').innerHTML = '<div class="text-center py-20 text-slate-300 italic text-sm">Pronto per la ricerca</div>';
+            document.getElementById('results').innerHTML = '<div class="text-center py-20 text-slate-300 italic text-sm">Inserisci un codice per cercare</div>';
         } catch (err) {
-            updateDebug("ERRORE DB", `<span class="text-red-400">${err.message}</span>`);
-            console.error("Errore critico:", err);
+            updateDebug("ERRORE", `<span class="text-red-400">${err.message}</span>`);
+            console.error("Errore initDatabase:", err);
         }
     }
 
+    /**
+     * LOGICA RICERCA
+     */
     document.getElementById('searchForm').addEventListener('submit', (e) => {
         e.preventDefault();
         const q = document.getElementById('query').value.toLowerCase().trim();
@@ -147,6 +161,9 @@
         });
     }
 
+    /**
+     * LOGICA MODALI
+     */
     function showDetails(imp) {
         const html = generateDetailHTML(imp);
         if (window.innerWidth < 1024) {
@@ -173,6 +190,9 @@
 
     function closeSubModal() { document.getElementById('subModal').classList.add('hidden'); }
 
+    /**
+     * INFO EXTRA (Commesse/DC)
+     */
     function showCommessaInfo(idx) {
         const c = db.commesse[idx];
         const html = `
@@ -191,7 +211,7 @@
                     <span class="text-[10px] font-black text-slate-400 uppercase">Descrizione Lavori</span>
                     <p class="font-medium mt-1 leading-relaxed">${c['Descrizione Lavori'] || '---'}</p>
                 </div>
-                <p class="text-[11px] italic text-slate-400 border-t pt-2 leading-snug">Note: ${c['NOTE'] || 'Nessuna nota aggiuntiva'}</p>
+                <p class="text-[11px] italic text-slate-400 border-t pt-2">Note: ${c['NOTE'] || 'Nessuna nota'}</p>
             </div>`;
         openSubModal("Info Commessa", html);
     }
@@ -213,13 +233,16 @@
         openSubModal("Dettaglio DC", html);
     }
 
+    /**
+     * GENERAZIONE SCHEDA DETTAGLIATA
+     */
     function generateDetailHTML(imp) {
         const semGG = diffDays(imp['ult sem']);
         const vpGG = diffDays(imp['utl vp']);
         const ann = db.annotazioni.filter(a => String(a.impianto_ann) == String(imp.impianto));
         const verb = db.verbali.filter(v => String(v.IMPIANTO) == String(imp.impianto));
-        const dcList = db.archivio.map((v, i) => ({...v, originalIdx: i})).filter(a => String(a['N°IMPIANTO ESA']) == String(imp.impianto));
-        const commList = db.commesse.map((v, i) => ({...v, originalIdx: i})).filter(c => String(c['ID Imp.']) == String(imp.impianto));
+        const dcList = db.archivio.map((v, i) => ({...v, oIdx: i})).filter(a => String(a['N°IMPIANTO ESA']) == String(imp.impianto));
+        const commList = db.commesse.map((v, i) => ({...v, oIdx: i})).filter(c => String(c['ID Imp.']) == String(imp.impianto));
 
         return `
             <div class="space-y-8 pb-10">
@@ -247,9 +270,9 @@
                         <p class="text-xs font-bold pt-1">Ultima: ${formatDate(excelToDate(imp['ult sem']))} [${semGG || '---'} gg]</p>
                     </div>
                     <div class="p-5 bg-amber-50 rounded-2xl border border-amber-100 text-amber-900">
-                        <span class="block text-[10px] font-black uppercase opacity-60">Visita Ente</span>
+                        <span class="block text-[10px] font-black uppercase opacity-60 font-bold">Verifica ENTE</span>
                         <p class="text-xs font-bold">Ultima: ${formatDate(excelToDate(imp['utl vp']))}</p>
-                        <p class="text-[10px] font-bold opacity-60 mt-1 uppercase">Da ${vpGG || '---'} giorni</p>
+                        <p class="text-[10px] uppercase font-bold opacity-60 mt-1">Da ${vpGG || '---'} giorni</p>
                     </div>
                 </div>
 
@@ -263,33 +286,34 @@
                         <span class="text-slate-400 font-bold uppercase text-[9px]">Anagrafica Cliente</span>
                         <p class="text-lg font-black text-slate-800 leading-tight">${imp.Cliente || '---'}</p>
                         <p class="text-xs text-blue-600 font-bold mt-1">Amm: ${imp.Amministratore || '---'}</p>
-                        <div class="mt-4 p-4 bg-slate-50 rounded-xl italic text-xs text-slate-600">Note: ${imp.note || 'Nessuna nota specifica'}</div>
+                        <div class="mt-4 p-4 bg-slate-50 rounded-xl italic text-xs text-slate-600">Note: ${imp.note || 'Nessuna nota'}</div>
                     </div>
                 </div>
 
                 <div class="space-y-4">
                     <h4 class="text-sm font-black text-slate-900 uppercase tracking-tighter">Ultime Annotazioni</h4>
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        ${ann.length ? ann.map(a => `<div class="p-4 bg-slate-50 rounded-2xl text-xs border border-slate-100"><div class="flex justify-between font-black text-blue-600 mb-2"><span>${a.giorno_ann}/${a.mese_ann}/${a.anno_ann}</span><span class="text-slate-400">👨‍🔧 ${a.tecnico_ann || ''}</span></div><p class="text-slate-700 leading-relaxed">${a.note || '---'}</p></div>`).join('') : '<p class="text-xs text-slate-300 italic">Nessun dato registrato nell\'ultimo anno</p>'}
+                        ${ann.length ? ann.map(a => `<div class="p-4 bg-slate-50 rounded-2xl text-xs border border-slate-100"><div class="flex justify-between font-black text-blue-600 mb-2"><span>${a.giorno_ann}/${a.mese_ann}/${a.anno_ann}</span><span class="text-slate-400">👨‍🔧 ${a.tecnico_ann || ''}</span></div><p class="text-slate-700 leading-relaxed">${a.note || '---'}</p></div>`).join('') : '<p class="text-xs text-slate-300 italic">Nessun dato registrato</p>'}
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm space-y-3">
-                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Verbali PDF</h4>
+                        <h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Verbali PDF</h4>
                         <div class="space-y-1">${verb.map(v => `<div class="text-[10px] font-bold text-red-700 bg-red-50 p-1.5 rounded border border-red-100 truncate"><i class="fas fa-file-pdf mr-1"></i>${v['NOME FILE']}</div>`).join('') || '---'}</div>
                     </div>
                     <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm space-y-3">
-                        <h4 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Archivio DC</h4>
-                        <div class="space-y-2">${dcList.map(d => `<div class="flex justify-between items-center bg-emerald-50 p-2 rounded-lg border border-emerald-100 text-[9px] font-bold"><span>PR. ${d['N°  PRATICA ARCHIVIO']}</span><button onclick="event.stopPropagation(); showDcInfo(${d.originalIdx})" class="bg-emerald-600 text-white px-2 py-0.5 rounded-lg shadow-sm">INFO</button></div>`).join('') || 'Nessuna DC'}</div>
+                        <h4 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Archivio DC</h4>
+                        <div class="space-y-2">${dcList.map(d => `<div class="flex justify-between items-center bg-emerald-50 p-2 rounded-lg border border-emerald-100 text-[9px] font-bold"><span>PR. ${d['N°  PRATICA ARCHIVIO']}</span><button onclick="event.stopPropagation(); showDcInfo(${d.oIdx})" class="bg-emerald-600 text-white px-2 py-0.5 rounded-lg shadow-sm">INFO</button></div>`).join('') || 'Nessuna DC'}</div>
                     </div>
                     <div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm space-y-3">
-                        <h4 class="text-[10px] font-black text-amber-600 uppercase tracking-widest italic">Commesse</h4>
-                        <div class="space-y-2">${commList.map(c => `<div class="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100 text-[9px] font-bold"><span>${c['Numero Commessa']}</span><button onclick="event.stopPropagation(); showCommessaInfo(${c.originalIdx})" class="bg-amber-600 text-white px-2 py-0.5 rounded-lg shadow-sm">INFO</button></div>`).join('') || 'Nessuna Commessa'}</div>
+                        <h4 class="text-[10px] font-black text-amber-600 uppercase tracking-widest">Commesse</h4>
+                        <div class="space-y-2">${commList.map(c => `<div class="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100 text-[9px] font-bold"><span>${c['Numero Commessa']}</span><button onclick="event.stopPropagation(); showCommessaInfo(${c.oIdx})" class="bg-amber-600 text-white px-2 py-0.5 rounded-lg shadow-sm">INFO</button></div>`).join('') || 'Nessuna Commessa'}</div>
                     </div>
                 </div>
             </div>`;
     }
 
+    // AVVIO
     initDatabase();
 </script>
