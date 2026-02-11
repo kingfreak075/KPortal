@@ -1,67 +1,118 @@
-<div class="mb-8">
-    <h1 class="text-2xl font-bold text-slate-900">Configurazione</h1>
-    <p class="text-slate-500">Gestisci le preferenze del portale e le tue impostazioni utente.</p>
-</div>
-
-<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
+<div class="p-4 md:p-8 max-w-5xl mx-auto space-y-8 animate-in fade-in duration-500">
+    <div class="bg-white rounded-3xl shadow-sm border border-slate-100 p-8">
         <div class="flex items-center gap-4 mb-4">
-            <div class="p-3 bg-blue-100 text-blue-600 rounded-lg">
-                <i class="fas fa-user-gear text-xl"></i>
-            </div>
-            <h2 class="font-semibold text-lg">Profilo Utente</h2>
-        </div>
-        <div class="space-y-4">
-            <div>
-                <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Nome Operatore</label>
-                <input type="text" value="Mario Rossi" class="w-full p-2 bg-slate-50 border border-slate-200 rounded-md focus:ring-2 focus:ring-blue-500 outline-none transition-all">
+            <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-blue-200">
+                <i class="fas fa-tools text-xl"></i>
             </div>
             <div>
-                <label class="block text-xs font-medium text-slate-400 uppercase mb-1">Email Supporto</label>
-                <p class="text-sm text-slate-600">mirko.desalvo@partners.ceam.it</p>
+                <h1 class="text-3xl font-black text-slate-900 tracking-tighter">Configurazione Database</h1>
+                <p class="text-slate-500 font-medium text-sm text-balance">Aggiorna il database del portale in pochi secondi.</p>
+            </div>
+        </div>
+
+        <div class="mt-8 space-y-6">
+            <div id="dropZone" 
+                 class="group border-4 border-dashed border-slate-100 rounded-[2.5rem] p-12 text-center hover:border-blue-400 hover:bg-blue-50 transition-all cursor-pointer relative overflow-hidden">
+                <div class="relative z-10">
+                    <div class="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 group-hover:scale-110 transition-transform duration-300">
+                        <i class="fas fa-file-excel text-4xl text-emerald-500"></i>
+                    </div>
+                    <p class="text-slate-700 font-black text-lg">Trascina qui il file DB.xlsx</p>
+                    <p class="text-slate-400 text-sm font-medium mt-1">il file verrà convertito in database.json</p>
+                </div>
+                <input type="file" id="fileInput" class="hidden" accept=".xlsx">
+            </div>
+
+            <div id="statusArea" class="hidden space-y-4">
+                <div id="processingCard" class="bg-slate-900 rounded-3xl p-6 text-white shadow-xl flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <div id="spinner" class="animate-spin rounded-full h-8 w-8 border-4 border-blue-500/30 border-t-blue-500"></div>
+                        <div>
+                            <p id="statusText" class="font-bold text-sm tracking-wide uppercase">Elaborazione...</p>
+                        </div>
+                    </div>
+                    <button id="downloadBtn" class="hidden bg-emerald-500 hover:bg-emerald-400 text-white px-6 py-3 rounded-2xl font-black text-xs tracking-widest transition-all shadow-lg flex items-center gap-2">
+                        <i class="fas fa-download text-lg"></i> SCARICA DATABASE.JSON
+                    </button>
+                </div>
             </div>
         </div>
     </div>
 
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100">
-        <div class="flex items-center gap-4 mb-4">
-            <div class="p-3 bg-purple-100 text-purple-600 rounded-lg">
-                <i class="fas fa-sliders text-xl"></i>
-            </div>
-            <h2 class="font-semibold text-lg">Preferenze App</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-blue-600 rounded-3xl p-6 text-white">
+            <span class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-black mb-4 italic">1</span>
+            <h4 class="font-black text-sm uppercase mb-2 italic">Converti Excel</h4>
+            <p class="text-xs text-blue-100 leading-relaxed italic">Seleziona il tuo file DB.xlsx originale per avviarne la conversione automatica.</p>
         </div>
-        <div class="space-y-4">
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-700">Notifiche Push</span>
-                <button class="w-10 h-5 bg-slate-200 rounded-full relative transition-colors duration-200 focus:outline-none">
-                    <span class="absolute left-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-200"></span>
-                </button>
-            </div>
-            <div class="flex items-center justify-between">
-                <span class="text-sm text-slate-700">Sincronizzazione Automatica</span>
-                <button class="w-10 h-5 bg-blue-500 rounded-full relative transition-colors duration-200 focus:outline-none">
-                    <span class="absolute right-1 top-1 bg-white w-3 h-3 rounded-full transition-transform duration-200"></span>
-                </button>
-            </div>
+        <div class="bg-slate-900 rounded-3xl p-6 text-white italic">
+            <span class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-black mb-4 italic">2</span>
+            <h4 class="font-black text-sm uppercase mb-2 italic">Scarica JSON</h4>
+            <p class="text-xs text-slate-400 leading-relaxed italic">Salva il file generato sul tuo computer. Il nome sarà obbligatoriamente <b>database.json</b>.</p>
+        </div>
+        <div class="bg-emerald-600 rounded-3xl p-6 text-white shadow-xl italic">
+            <span class="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center font-black mb-4 italic">3</span>
+            <h4 class="font-black text-sm uppercase mb-2 italic">Sposta in Cartella</h4>
+            <p class="text-xs text-emerald-100 leading-relaxed italic font-bold">CARICA IL FILE NELLA CARTELLA "database" del tuo progetto su GitHub.</p>
         </div>
     </div>
-
-    <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-100 md:col-span-2">
-        <div class="flex items-center gap-4 mb-4">
-            <div class="p-3 bg-amber-100 text-amber-600 rounded-lg">
-                <i class="fas fa-database text-xl"></i>
-            </div>
-            <h2 class="font-semibold text-lg">Dati e Cache</h2>
-        </div>
-        <p class="text-sm text-slate-600 mb-4">Pulisci la cache locale per forzare l'aggiornamento dei moduli del portale.</p>
-        <button class="px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-lg hover:bg-red-100 transition-colors text-sm font-medium">
-            Svuota Cache Locale
-        </button>
-    </div>
-
 </div>
 
-<div class="mt-8 text-center text-slate-400 text-xs">
-    ID Dispositivo: ESA-REG-99210-2026
-</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const statusArea = document.getElementById('statusArea');
+    const statusText = document.getElementById('statusText');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const spinner = document.getElementById('spinner');
+
+    dropZone.onclick = () => fileInput.click();
+    fileInput.onchange = (e) => handleFile(e.target.files[0]);
+    dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('bg-blue-50'); };
+    dropZone.ondrop = (e) => { e.preventDefault(); handleFile(e.dataTransfer.files[0]); };
+
+    function handleFile(file) {
+        if (!file) return;
+        statusArea.classList.remove('hidden');
+        downloadBtn.classList.add('hidden');
+        spinner.classList.remove('hidden');
+        statusText.textContent = "CONVERSIONE IN CORSO...";
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            try {
+                const data = new Uint8Array(e.target.result);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                const databaseJson = {
+                    parco: XLSX.utils.sheet_to_json(workbook.Sheets["PARCO"] || []),
+                    m28: XLSX.utils.sheet_to_json(workbook.Sheets["M28"] || []),
+                    archivio: XLSX.utils.sheet_to_json(workbook.Sheets["ARCHIVIO"] || []),
+                    verbali: XLSX.utils.sheet_to_json(workbook.Sheets["ELENCO"] || []),
+                    annotazioni: XLSX.utils.sheet_to_json(workbook.Sheets["ANNOTAZIONI"] || []),
+                    commesse: XLSX.utils.sheet_to_json(workbook.Sheets["Gestione Commesse Q2SA BO"] || []),
+                    mappature: XLSX.utils.sheet_to_json(workbook.Sheets["MAPPATURE"] || [])
+                };
+
+                const blob = new Blob([JSON.stringify(databaseJson)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+
+                statusText.textContent = "COMPLETATO!";
+                spinner.classList.add('hidden');
+                downloadBtn.classList.remove('hidden');
+
+                downloadBtn.onclick = () => {
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = "database.json";
+                    a.click();
+                };
+            } catch (err) {
+                statusText.textContent = "ERRORE";
+                spinner.classList.add('hidden');
+            }
+        };
+        reader.readAsArrayBuffer(file);
+    }
+</script>

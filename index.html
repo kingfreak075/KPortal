@@ -1,188 +1,93 @@
 <!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>ESA Portal - Professional Suite</title>
-
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- SheetJS (XLSX) - caricato una sola volta qui -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js" integrity="sha512-Wm5b9lq6B8gPvD+3Q2gRQyO6C5h/7nO3k8tGVH1B4f7g7smE9mXl3N2zJ0h1tJR3fH1YdCqgPh8F9f+qgwo3Xw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
-
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-    body { font-family: 'Inter', sans-serif; background-color: #f8fafc; }
-    #main-content { transition: opacity 0.2s ease-in-out; }
-    .active-link { background-color: #3b82f6 !important; color: white !important; }
-    .no-scrollbar::-webkit-scrollbar { display: none; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ESA Portal - Professional Suite</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; background-color: #f8fafc; overflow: hidden; }
+        #main-content { transition: opacity 0.2s ease-in-out; }
+        .active-link { background-color: #3b82f6 !important; color: white !important; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
 </head>
 <body class="text-slate-800">
 
-  <!-- SIDEBAR (desktop) -->
-  <aside class="hidden md:flex flex-col w-64 h-screen bg-slate-900 text-white fixed left-0 top-0 shadow-xl">
-    <div class="p-6">
-      <img src="logo.png" alt="ESA Logo" class="w-32 mx-auto mb-8">
-      <nav class="space-y-2">
-        <button onclick="navigateTo('ricerca.html', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fas fa-search w-6"></i> <span>Parco Impianti</span>
+    <aside class="hidden md:flex flex-col w-64 h-screen bg-slate-900 text-white fixed left-0 top-0 shadow-xl">
+        <div class="p-6">
+            <h2 class="text-xl font-black tracking-tighter mb-8 text-blue-400">ESA PORTAL</h2>
+            <nav class="space-y-2">
+                <button onclick="navigateTo('ricerca.html', this)" class="nav-btn w-full flex items-center p-3 rounded-xl hover:bg-slate-800 transition-all text-sm font-bold">
+                    <i class="fas fa-search w-6"></i> <span>Parco Impianti</span>
+                </button>
+                <button onclick="navigateTo('config.htm', this)" class="nav-btn w-full flex items-center p-3 rounded-xl hover:bg-slate-800 transition-all text-sm font-bold opacity-60">
+                    <i class="fas fa-cog w-6"></i> <span>Configurazione</span>
+                </button>
+            </nav>
+        </div>
+    </aside>
+
+    <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around items-center h-16 pb-1 z-50 shadow-2xl">
+        <button onclick="navigateTo('ricerca.html', this)" class="nav-btn flex flex-col items-center text-blue-600">
+            <i class="fas fa-search text-lg"></i>
+            <span class="text-[10px] mt-1 font-bold">Ricerca</span>
         </button>
-        <button onclick="navigateTo('cerca_verb.html', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fas fa-clipboard w-6"></i> <span>Verbali</span>
+        <button onclick="navigateTo('config.htm', this)" class="nav-btn flex flex-col items-center text-slate-400">
+            <i class="fas fa-cog text-lg"></i>
+            <span class="text-[10px] mt-1 font-bold">Config</span>
         </button>
-        <button onclick="navigateTo('GiroMan.html', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fas fa-tools w-6"></i> <span>Manutenzioni</span>
-        </button>
-        <button onclick="navigateTo('verifica_DC3.html', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fas fa-folder-open w-6"></i> <span>Pratiche DC</span>
-        </button>
-        <button onclick="navigateTo('fogliolavoro.html', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fas fa-calendar-check w-6"></i> <span>Foglio Ore</span>
-        </button>
-        <button onclick="navigateTo('gemini_21.html', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors">
-          <i class="fas fa-users w-6"></i> <span>Riepilogo Dipendenti</span>
-        </button>
-        <hr class="border-slate-700 my-4">
-        <button onclick="navigateTo('config.htm', this)" class="nav-btn w-full flex items-center p-3 rounded-lg hover:bg-slate-800 transition-colors text-slate-400">
-          <i class="fas fa-cog w-6"></i> <span>Configurazione</span>
-        </button>
-      </nav>
-    </div>
-    <div class="mt-auto p-6 text-xs text-slate-500 border-t border-slate-800 text-center">
-      ESA Portal v3.0.0
-    </div>
-  </aside>
+    </nav>
 
-  <!-- NAV MOBILE -->
-  <nav class="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-slate-200 flex justify-around items-center h-16 pb-1 z-50 shadow-[0_-2px_10px_rgba(0,0,0,0.05)]">
-    <button onclick="navigateTo('ricerca.html', this)" class="nav-btn flex flex-col items-center text-slate-500">
-      <i class="fas fa-search text-lg"></i>
-      <span class="text-[10px] mt-1 font-medium text-center">Impianti</span>
-    </button>
-    <button onclick="navigateTo('cerca_verb.html', this)" class="nav-btn flex flex-col items-center text-slate-500">
-      <i class="fas fa-clipboard text-lg"></i>
-      <span class="text-[10px] mt-1 font-medium">Verbali</span>
-    </button>
-    <button onclick="navigateTo('GiroMan.html', this)" class="nav-btn flex flex-col items-center text-slate-500">
-      <i class="fas fa-tools text-lg"></i>
-      <span class="text-[10px] mt-1 font-medium text-center">Giri</span>
-    </button>
-    <button onclick="navigateTo('fogliolavoro.html', this)" class="nav-btn flex flex-col items-center text-slate-500">
-      <i class="fas fa-calendar-check text-lg"></i>
-      <span class="text-[10px] mt-1 font-medium text-center">Ore</span>
-    </button>
-    <button onclick="navigateTo('config.htm', this)" class="nav-btn flex flex-col items-center text-slate-500">
-      <i class="fas fa-cog text-lg"></i>
-      <span class="text-[10px] mt-1 font-medium text-center">Config</span>
-    </button>
-  </nav>
+    <main class="md:ml-64 h-screen">
+        <div id="main-content" class="h-full p-4 md:p-8 overflow-hidden">
+            </div>
+    </main>
 
-  <!-- MAIN -->
-  <main class="md:ml-64 min-h-screen pb-20 md:pb-0">
-    <header class="md:hidden flex items-center justify-between p-4 bg-slate-900 text-white sticky top-0 z-40">
-      <span class="font-bold tracking-tight">ESA PORTAL</span>
-      <i class="fas fa-user-circle text-xl"></i>
-    </header>
+    <script>
+        async function navigateTo(url, element) {
+            const contentArea = document.getElementById('main-content');
+            contentArea.style.opacity = '0';
 
-    <div id="main-content" class="p-4 md:p-8">
-      <div class="flex items-center justify-center h-64">
-        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
-    </div>
-  </main>
-
-  <script>
-    /**
-     * Navigazione SPA con fetch e reiniezione script affidabile (ordine preservato)
-     */
-    async function navigateTo(url, element) {
-      const contentArea = document.getElementById('main-content');
-      contentArea.style.opacity = '0';
-
-      try {
-        const response = await fetch(url, { cache: 'no-cache' });
-        if (!response.ok) throw new Error('Pagina non trovata');
-        const html = await response.text();
-
-        setTimeout(async () => {
-          // 1) Inserisci il markup
-          contentArea.innerHTML = html;
-
-          // 2) Trova e riesegui gli <script> in ordine
-          const oldScripts = Array.from(contentArea.querySelectorAll('script'));
-
-          for (const oldScript of oldScripts) {
-            const newScript = document.createElement('script');
-
-            // Copia attributi (src, type, defer, etc.)
-            for (const { name, value } of Array.from(oldScript.attributes)) {
-              newScript.setAttribute(name, value);
-            }
-
-            if (oldScript.src) {
-              // Script esterno: attendi il caricamento
-              await new Promise((resolve, reject) => {
-                newScript.onload = () => resolve();
-                newScript.onerror = () => reject(new Error('Errore caricamento script: ' + oldScript.src));
-                newScript.src = oldScript.src;
-                oldScript.replaceWith(newScript);
-              });
-            } else {
-              // Script inline: usa textContent (non innerHTML)
-              try {
-                newScript.text = oldScript.textContent || '';
-                oldScript.replaceWith(newScript);
-              } catch (e) {
-                console.error('Errore in script inline:', e, '\nSnippet:', (oldScript.textContent || '').slice(0, 200));
-                contentArea.innerHTML = `
-                  <div class="p-4 text-red-600 font-bold">
-                    Errore nello script della pagina caricata: ${e.message}.<br/>
-                    Verifica backtick/virgolette e template literal.
-                  </div>`;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Pagina non trovata');
+                const html = await response.text();
+                
+                setTimeout(() => {
+                    contentArea.innerHTML = html;
+                    const scripts = contentArea.querySelectorAll('script');
+                    scripts.forEach(oldScript => {
+                        const newScript = document.createElement('script');
+                        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+                        newScript.appendChild(document.createTextNode(oldScript.innerHTML));
+                        oldScript.parentNode.replaceChild(newScript, oldScript);
+                    });
+                    contentArea.style.opacity = '1';
+                    if(element) updateActiveState(element);
+                }, 200);
+            } catch (error) {
+                contentArea.innerHTML = `<div class="p-8 text-red-500 font-bold">Errore: ${error.message}</div>`;
                 contentArea.style.opacity = '1';
-                return;
-              }
             }
-          }
-
-          contentArea.style.opacity = '1';
-          updateActiveState(element);
-        }, 150);
-
-      } catch (error) {
-        contentArea.innerHTML = `<div class="p-4 text-red-500 font-bold">Errore: ${error.message}</div>`;
-        contentArea.style.opacity = '1';
-      }
-    }
-
-    function updateActiveState(activeElement) {
-      document.querySelectorAll('.nav-btn').forEach(btn => {
-        btn.classList.remove('active-link', 'text-blue-600', 'text-white');
-        if (!btn.closest('aside')) { // Mobile
-          btn.classList.add('text-slate-500');
         }
-      });
 
-      if (activeElement) {
-        if (activeElement.closest('aside')) {
-          activeElement.classList.add('active-link');
-        } else {
-          activeElement.classList.remove('text-slate-500');
-          activeElement.classList.add('text-blue-600');
+        function updateActiveState(activeElement) {
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active-link', 'text-blue-600');
+                if(!btn.closest('aside')) btn.classList.add('text-slate-400');
+            });
+            if (activeElement.closest('aside')) {
+                activeElement.classList.add('active-link');
+            } else {
+                activeElement.classList.remove('text-slate-400');
+                activeElement.classList.add('text-blue-600');
+            }
         }
-      }
-    }
 
-    // Caricamento iniziale
-    window.addEventListener('DOMContentLoaded', () => {
-      const firstButton = document.querySelector('aside .nav-btn');
-      navigateTo('ricerca.html', firstButton);
-    });
-  </script>
+        window.addEventListener('DOMContentLoaded', () => navigateTo('ricerca.html'));
+    </script>
 </body>
 </html>

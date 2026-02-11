@@ -1,307 +1,219 @@
-<!-- CONTENUTO: Parco Impianti -->
 <div class="flex flex-col h-screen overflow-hidden">
-  <div class="flex justify-between items-start mb-4 shrink-0 px-2">
-    <div>
-      <h1 class="text-2xl font-bold text-slate-900">Parco Impianti</h1>
-      <p class="text-slate-500 text-sm">King Portal - Database Integrato</p>
-    </div>
-    <div id="debugPanel" class="hidden md:block bg-slate-800 text-white p-2 rounded-lg text-[10px] font-mono border border-slate-700 min-w-[200px]">
-      <div class="flex justify-between border-b border-slate-700 pb-1 mb-1">
-        <span class="text-slate-400 uppercase">Stato:</span>
-        <span id="dbStatusText" class="text-amber-400 font-bold">AVVIO...</span>
-      </div>
-      <div id="debugStats" class="text-blue-300"></div>
-    </div>
-  </div>
-
-  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
-    <!-- Colonna sinistra: ricerca e lista -->
-    <div class="lg:col-span-4 flex flex-col min-h-0 space-y-4">
-      <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 shrink-0">
-        <form id="searchForm" class="space-y-3">
-          <input type="text" id="query" placeholder="ID (E8Y...) o Indirizzo..."
-                 class="w-full p-3 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium">
-          <button type="submit" class="w-full py-3 bg-blue-600 text-white font-bold rounded-lg shadow-md active:scale-95 uppercase text-xs">Cerca</button>
-        </form>
-      </div>
-      <div id="results" class="flex-1 overflow-y-auto pr-2 space-y-2 no-scrollbar pb-24">
-        <div class="text-center py-10 text-slate-300 italic text-sm">Pronto per la ricerca</div>
-      </div>
+    <div class="flex justify-between items-start mb-4 shrink-0 px-2 md:px-0">
+        <div>
+            <h1 class="text-2xl font-bold text-slate-900">Parco Impianti</h1>
+            <p class="text-slate-500 text-sm">King Portal - Database JSON</p>
+        </div>
+        <div id="debugPanel" class="hidden md:block bg-slate-800 text-white p-2 rounded-lg text-[10px] font-mono border border-slate-700 min-w-[200px]">
+            <div class="flex justify-between border-b border-slate-700 pb-1 mb-1">
+                <span class="text-slate-400 uppercase">Stato Data:</span>
+                <span id="dbStatusText" class="text-amber-400 font-bold">CARICAMENTO...</span>
+            </div>
+            <div id="debugStats" class="text-blue-300"></div>
+        </div>
     </div>
 
-    <!-- Colonna destra: dettaglio (desktop) -->
-    <div class="hidden lg:block lg:col-span-8 overflow-y-auto no-scrollbar pb-4 h-full">
-      <div id="desktopDetailArea" class="bg-white rounded-3xl shadow-sm border border-slate-100 min-h-full p-10 text-center flex flex-col items-center justify-center text-slate-300">
-        <i class="fas fa-elevator text-5xl mb-4 opacity-10"></i>
-        <p>Seleziona un impianto per i dettagli</p>
-      </div>
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 flex-1 min-h-0">
+        <div class="lg:col-span-4 flex flex-col min-h-0 space-y-4">
+            <div class="bg-white p-4 rounded-xl shadow-sm border border-slate-100 shrink-0">
+                <form id="searchForm" class="space-y-3">
+                    <div class="relative">
+                        <input type="text" id="query" placeholder="ID o Indirizzo..." 
+                               class="w-full p-3 pl-10 bg-slate-50 border border-slate-200 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none text-sm font-medium">
+                        <i class="fas fa-search absolute left-3 top-3.5 text-slate-400"></i>
+                    </div>
+                    <button type="submit" class="w-full py-3 bg-blue-600 text-white font-black rounded-lg shadow-md uppercase text-xs tracking-widest">Cerca</button>
+                </form>
+            </div>
+            <div id="results" class="flex-1 overflow-y-auto pr-2 space-y-2 no-scrollbar pb-24 md:pb-4"></div>
+        </div>
+
+        <div class="hidden lg:block lg:col-span-8 overflow-y-auto no-scrollbar pb-4 h-full">
+            <div id="desktopDetailArea" class="bg-white rounded-3xl shadow-sm border border-slate-100 min-h-full p-10 text-center flex flex-col items-center justify-center text-slate-300">
+                <i class="fas fa-elevator text-5xl mb-4 opacity-10"></i>
+                <p>Seleziona un impianto per i dettagli</p>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
 
-<!-- Modal (mobile) -->
 <div id="mobileModal" class="fixed inset-0 z-[100] hidden lg:hidden">
-  <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
-  <div id="modalContainer" class="absolute bottom-0 left-0 right-0 top-16 bg-white rounded-t-[2.5rem] shadow-2xl flex flex-col transform translate-y-full transition-transform duration-300">
-    <div class="w-full flex justify-center py-4 shrink-0" onclick="closeModal()"><div class="w-12 h-1.5 bg-slate-200 rounded-full"></div></div>
-    <div id="mobileDetailArea" class="flex-1 overflow-y-auto p-6 no-scrollbar pb-24"></div>
-    <div class="p-4 bg-white border-t shrink-0 text-center">
-      <button onclick="closeModal()" class="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl">CHIUDI</button>
+    <div class="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onclick="closeModal()"></div>
+    <div id="modalContainer" class="absolute bottom-0 left-0 right-0 top-16 bg-white rounded-t-[2.5rem] shadow-2xl flex flex-col transform translate-y-full transition-transform duration-300">
+        <div class="w-full flex justify-center py-4 shrink-0" onclick="closeModal()"><div class="w-12 h-1.5 bg-slate-200 rounded-full"></div></div>
+        <div id="mobileDetailArea" class="flex-1 overflow-y-auto p-6 no-scrollbar pb-24"></div>
+        <div class="p-4 bg-white border-t shrink-0 text-center"><button onclick="closeModal()" class="w-full py-4 bg-slate-900 text-white font-bold rounded-2xl">CHIUDI</button></div>
     </div>
-  </div>
 </div>
 
-<!-- Sub Modal -->
 <div id="subModal" class="fixed inset-0 z-[110] hidden flex items-center justify-center p-4">
-  <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeSubModal()"></div>
-  <div class="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden">
-    <div class="p-6 border-b flex justify-between items-center bg-slate-50">
-      <h3 id="subModalTitle" class="text-lg font-black text-slate-900 uppercase tracking-tighter">Dettagli</h3>
-      <button onclick="closeSubModal()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
+    <div class="absolute inset-0 bg-slate-900/80 backdrop-blur-md" onclick="closeSubModal()"></div>
+    <div class="relative bg-white w-full max-w-lg rounded-3xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200">
+        <div class="p-6 border-b flex justify-between items-center bg-slate-50">
+            <h3 id="subModalTitle" class="text-lg font-black text-slate-900 uppercase">Dettagli</h3>
+            <button onclick="closeSubModal()" class="text-slate-400 hover:text-red-500"><i class="fas fa-times-circle text-xl"></i></button>
+        </div>
+        <div id="subModalContent" class="p-8 text-sm text-slate-700 space-y-6 max-h-[70vh] overflow-y-auto"></div>
     </div>
-    <div id="subModalContent" class="p-8 text-sm text-slate-700 space-y-6 max-h-[70vh] overflow-y-auto"></div>
-  </div>
 </div>
 
 <script>
-  /*** Utils ***/
-  function updateDebug(status, stats = "") {
-    const s = document.getElementById('dbStatusText');
-    const d = document.getElementById('debugStats');
-    if (s) s.textContent = status;
-    if (d) d.innerHTML = stats;
-  }
-
-  // Escape per prevenire rotture HTML/XSS
-  const esc = (s) => String(s == null ? '' : s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
-
-  // Excel serial -> Date (robusta)
-  const excelToDate = (ed) => {
-    if (ed == null || ed === '') return null;
-    const n = typeof ed === 'number' ? ed : parseFloat(ed);
-    if (!Number.isFinite(n)) return null;
-    const ms = Math.round((n - 25569) * 86400 * 1000);
-    if (!Number.isFinite(ms) || ms <= 0) return null;
-    const dt = new Date(ms);
-    return isNaN(dt.getTime()) ? null : dt;
-  };
-  const formatDate = (date) => (date instanceof Date && !isNaN(date)) ? date.toLocaleDateString('it-IT') : '---';
-  const diffDays = (ed) => {
-    const d = excelToDate(ed);
-    if (!d) return null;
-    const now = new Date();
-    return Math.floor((now - d) / (1000 * 60 * 60 * 24));
-  };
-
-  // Lettura fogli sicura
-  const getSheet = (wb, name) => (wb.Sheets && wb.Sheets[name]) ? XLSX.utils.sheet_to_json(wb.Sheets[name]) : [];
-
-  // DB globale
-  var db = { parco: [], m28: [], mappature: { comm: {}, giri: {} }, archivio: [], verbali: [], annotazioni: [], commesse: [] };
-
-  // Inizializzazione DB
-  async function initDatabase() {
-    try {
-      updateDebug("CARICAMENTO...");
-      if (typeof XLSX === 'undefined') throw new Error("Libreria XLSX non disponibile");
-
-      // Calcola base path (compatibile con GitHub Pages e sottocartelle)
-      const base = document.querySelector('base')?.getAttribute('href')
-        || (location.pathname.endsWith('/') ? location.pathname : location.pathname.replace(/\/[^/]*$/, '/'));
-
-      const response = await fetch(`${base}database/DB.xlsx`, { cache: 'no-cache' });
-      if (!response.ok) throw new Error("File DB.xlsx non trovato in /database/");
-
-      const arrayBuffer = await response.arrayBuffer();
-      const workbook = XLSX.read(arrayBuffer, { type: 'array' });
-
-      db.parco       = getSheet(workbook, "PARCO");
-      db.m28         = getSheet(workbook, "M28");
-      db.archivio    = getSheet(workbook, "ARCHIVIO");
-      db.verbali     = getSheet(workbook, "ELENCO");
-      db.annotazioni = getSheet(workbook, "ANNOTAZIONI");
-      db.commesse    = getSheet(workbook, "Gestione Commesse Q2SA BO");
-      const mapData  = getSheet(workbook, "MAPPATURE");
-
-      mapData.forEach(row => {
-        if (row.Tipo === 'COMMERCIALE' && row.Codice != null) db.mappature.comm[row.Codice] = row.Nome;
-        if (row.Tipo === 'GIRO'        && row.Codice != null) db.mappature.giri[row.Codice] = row.Nome;
-      });
-
-      updateDebug("PRONTO", `Record: ${db.parco.length}`);
-      const st = document.getElementById('dbStatusText');
-      if (st) st.className = "text-emerald-400 font-bold";
-    } catch (err) {
-      console.error(err);
-      updateDebug("ERRORE", esc(err.message));
+    function updateDebug(status, stats = "") {
+        const s = document.getElementById('dbStatusText');
+        const d = document.getElementById('debugStats');
+        if (s) s.textContent = status;
+        if (d) d.innerHTML = stats;
     }
-  }
 
-  // Ricerca (submit)
-  document.getElementById('searchForm').addEventListener('submit', (e) => {
-    e.preventDefault();
-    const q = (document.getElementById('query').value || '').toLowerCase().trim();
-    if (q.length < 3) return;
-    const results = (db.parco || []).filter(item =>
-      String(item.impianto || '').toLowerCase().includes(q) ||
-      String(item['Indirizzo impianto'] || '').toLowerCase().includes(q)
-    );
-    renderResults(results);
-  });
+    var db = { parco: [], m28: [], mappature: { comm: {}, giri: {} }, archivio: [], verbali: [], annotazioni: [], commesse: [] };
 
-  function renderResults(list) {
-    const container = document.getElementById('results');
-    if (!list || list.length === 0) {
-      container.innerHTML = '<div class="p-10 text-slate-300 italic">Nessun risultato</div>';
-      return;
+    const excelToDate = (ed) => (ed && !isNaN(ed)) ? new Date(Math.round((ed - 25569) * 86400 * 1000)) : null;
+    const formatDate = (date) => date ? date.toLocaleDateString('it-IT') : '---';
+    const diffDays = (ed) => (ed && !isNaN(ed)) ? Math.floor((new Date() - excelToDate(ed)) / (1000 * 60 * 60 * 24)) : null;
+
+    async function initDatabase() {
+        try {
+            updateDebug("FETCH JSON...");
+            // PERCORSO AGGIORNATO: Ora cerca dentro la cartella database
+            const response = await fetch('./database/database.json'); 
+            if (!response.ok) throw new Error("File database.json non trovato nella cartella /database!");
+            
+            const rawData = await response.json();
+            
+            db.parco = rawData.parco;
+            db.m28 = rawData.m28;
+            db.archivio = rawData.archivio;
+            db.verbali = rawData.verbali;
+            db.annotazioni = rawData.annotazioni;
+            db.commesse = rawData.commesse;
+            
+            rawData.mappature.forEach(row => {
+                if (row.Tipo === 'COMMERCIALE') db.mappature.comm[row.Codice] = row.Nome;
+                if (row.Tipo === 'GIRO') db.mappature.giri[row.Codice] = row.Nome;
+            });
+
+            updateDebug("PRONTO", `Impianti: ${db.parco.length}`);
+            document.getElementById('dbStatusText').className = "text-emerald-400 font-bold";
+        } catch (err) {
+            updateDebug("ERRORE", err.message);
+        }
     }
-    container.innerHTML = '';
-    list.slice(0, 50).forEach(item => {
-      const card = document.createElement('div');
-      card.className = "bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-500 cursor-pointer shadow-sm active:scale-95 transition-all group";
-      card.onclick = () => showDetails(item);
-      const imp = esc(item.impianto);
-      const ind = esc(item['Indirizzo impianto']);
-      const loc = esc(item['Località impianto']);
-      card.innerHTML = `
-        <div class="flex justify-between items-center text-left">
-          <div>
-            <div class="text-[10px] font-black text-blue-600 uppercase">${imp}</div>
-            <div class="text-sm font-bold text-slate-800 leading-tight">${ind}</div>
-            <div class="text-[10px] text-slate-400 font-bold mt-0.5 uppercase">${loc}</div>
-          </div>
-          <i class="fas fa-chevron-right text-slate-200 group-hover:text-blue-500"></i>
-        </div>`;
-      container.appendChild(card);
+
+    document.getElementById('searchForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const q = document.getElementById('query').value.toLowerCase().trim();
+        if (q.length < 3) return;
+        const results = db.parco.filter(item => 
+            String(item.impianto).toLowerCase().includes(q) || 
+            String(item['Indirizzo impianto']).toLowerCase().includes(q)
+        );
+        renderResults(results);
     });
-  }
 
-  function showDetails(imp) {
-    const html = generateDetailHTML(imp);
-    if (window.innerWidth < 1024) {
-      document.body.style.overflow = 'hidden';
-      document.getElementById('mobileDetailArea').innerHTML = html;
-      document.getElementById('mobileModal').classList.remove('hidden');
-      setTimeout(() => { document.getElementById('modalContainer').style.transform = "translateY(0)"; }, 10);
-    } else {
-      const area = document.getElementById('desktopDetailArea');
-      area.className = "bg-white rounded-3xl shadow-sm border border-slate-100 p-8 text-left h-full overflow-y-auto no-scrollbar scroll-smooth";
-      area.innerHTML = html;
+    function renderResults(list) {
+        const container = document.getElementById('results');
+        container.innerHTML = list.length ? '' : '<div class="p-10 text-slate-300 italic text-center">Nessun risultato</div>';
+        list.slice(0, 50).forEach(item => {
+            const card = document.createElement('div');
+            card.className = "bg-white p-4 rounded-xl border border-slate-200 hover:border-blue-500 cursor-pointer shadow-sm active:scale-95 transition-all group";
+            card.onclick = () => showDetails(item);
+            card.innerHTML = `<div class="flex justify-between items-center text-left"><div><div class="text-[10px] font-black text-blue-600 uppercase tracking-tighter">${item.impianto}</div><div class="text-sm font-bold text-slate-800 leading-tight">${item['Indirizzo impianto']}</div><div class="text-[10px] text-slate-400 font-bold mt-0.5 uppercase">${item['Località impianto']}</div></div><i class="fas fa-chevron-right text-slate-200 group-hover:text-blue-500"></i></div>`;
+            container.appendChild(card);
+        });
     }
-  }
 
-  function closeModal() {
-    document.getElementById('modalContainer').style.transform = "translateY(100%)";
-    setTimeout(() => {
-      document.getElementById('mobileModal').classList.add('hidden');
-      document.body.style.overflow = '';
-    }, 300);
-  }
+    function showDetails(imp) {
+        const html = generateDetailHTML(imp);
+        if (window.innerWidth < 1024) {
+            document.getElementById('mobileDetailArea').innerHTML = html;
+            document.getElementById('mobileModal').classList.remove('hidden');
+            setTimeout(() => { document.getElementById('modalContainer').style.transform = "translateY(0)"; }, 10);
+        } else {
+            const area = document.getElementById('desktopDetailArea');
+            area.className = "bg-white rounded-3xl shadow-sm border border-slate-100 p-8 text-left h-full overflow-y-auto no-scrollbar scroll-smooth";
+            area.innerHTML = html;
+        }
+    }
 
-  function openSubModal(title, content) {
-    document.getElementById('subModalTitle').textContent = title;
-    document.getElementById('subModalContent').innerHTML = content;
-    document.getElementById('subModal').classList.remove('hidden');
-  }
+    function closeModal() {
+        document.getElementById('modalContainer').style.transform = "translateY(100%)";
+        setTimeout(() => { document.getElementById('mobileModal').classList.add('hidden'); }, 300);
+    }
 
-  function closeSubModal() {
-    document.getElementById('subModal').classList.add('hidden');
-    document.getElementById('subModalContent').innerHTML = '';
-  }
+    function openSubModal(title, content) {
+        document.getElementById('subModalTitle').textContent = title;
+        document.getElementById('subModalContent').innerHTML = content;
+        document.getElementById('subModal').classList.remove('hidden');
+    }
 
-  // Info modali
-  function showCommessaInfo(idx) {
-    const c = db.commesse[idx];
-    const html = `<div class="space-y-4">
-      <div class="bg-blue-50 p-4 rounded-xl"><b>${esc(c['Numero Commessa'])}</b></div>
-      <p>Supervisore: <b>${esc(c['Supervisore STF'] || '---')}</b></p>
-      <p>Commerciale: <b>${esc(c['Addetto commerciale'] || '---')}</b></p>
-      <p>Lavori: ${esc(c['Descrizione Lavori'] || '---')}</p>
-    </div>`;
-    openSubModal("Info Commessa", html);
-  }
+    function closeSubModal() { document.getElementById('subModal').classList.add('hidden'); }
 
-  function showDcInfo(idx) {
-    const d = db.archivio[idx];
-    const html = `<div class="space-y-4">
-      <p>Pratica: <b>${esc(d['N°  PRATICA ARCHIVIO'])}</b></p>
-      <p>Tipo: ${esc(d['TIPO LAVORO'] || '---')}</p>
-      <p>Documenti: <b>${esc(d['DOC RICHIESTI'] || '---')}</b></p>
-    </div>`;
-    openSubModal("Dettaglio DC", html);
-  }
+    function showCommessaInfo(idx) {
+        const c = db.commesse[idx];
+        const html = `<div class="space-y-6"><div class="bg-blue-50 p-4 rounded-2xl border border-blue-100"><span class="text-[10px] font-black text-blue-400 uppercase tracking-widest">Numero Commessa</span><p class="font-black text-blue-800 text-2xl">${c['Numero Commessa']}</p></div><div class="grid grid-cols-2 gap-4 text-xs"><div><span class="font-bold text-slate-400 uppercase tracking-tighter">Supervisore STF:</span><br><b class="text-slate-900">${c['Supervisore STF'] || '---'}</b></div><div><span class="font-bold text-slate-400 uppercase tracking-tighter">Addetto Commerciale:</span><br><b class="text-slate-900">${c['Addetto commerciale'] || '---'}</b></div><div class="pt-2"><span class="font-bold text-slate-400 uppercase">Apertura:</span><br><b>${formatDate(excelToDate(c['Data commessa']))}</b></div><div class="pt-2"><span class="font-bold text-slate-400 uppercase">Stato:</span><br><b class="${c['Stato comm.'] === 'C' ? 'text-emerald-600' : 'text-amber-500'}">${c['Stato comm.'] === 'C' ? 'CHIUSA' : 'IN CORSO'}</b></div></div><div class="bg-slate-50 p-4 rounded-xl"><span class="text-[10px] font-black text-slate-400 uppercase">Descrizione Lavori</span><p class="font-medium mt-1 leading-relaxed">${c['Descrizione Lavori'] || '---'}</p></div><p class="text-[11px] italic text-slate-400 border-t pt-2 leading-snug">Note: ${c['NOTE'] || 'Nessuna nota aggiuntiva'}</p></div>`;
+        openSubModal("Info Commessa", html);
+    }
 
-  function generateDetailHTML(imp) {
-    const semGG = diffDays(imp['ult sem']);
-    const vpGG  = diffDays(imp['utl vp']);
-    const semText = semGG == null ? '---' : `${semGG} gg`;
-    const vpText  = vpGG == null ? '---' : `${vpGG} gg`;
+    function showDcInfo(idx) {
+        const d = db.archivio[idx];
+        const html = `<div class="space-y-4"><div class="bg-emerald-50 p-4 rounded-2xl border border-emerald-100 text-center"><span class="text-[10px] font-black text-emerald-500 uppercase">N° Pratica</span><p class="text-3xl font-black text-emerald-800">${d['N°  PRATICA ARCHIVIO']}</p></div><div class="text-xs space-y-2"><p><span class="font-bold text-slate-400 uppercase">Lavoro:</span> ${d['TIPO LAVORO'] || '---'}</p><p><span class="font-bold text-slate-400 uppercase">Stato:</span> ${d['STATO PRATICA'] || '---'}</p><div class="bg-slate-50 p-3 rounded-lg"><span class="font-bold text-slate-400 uppercase text-[9px]">Documenti:</span><br><b>${d['DOC RICHIESTI'] || '---'}</b></div></div></div>`;
+        openSubModal("Info Pratica DC", html);
+    }
 
-    const semDate = formatDate(excelToDate(imp['ult sem']));
-    const vpDate  = formatDate(excelToDate(imp['utl vp']));
+    function generateDetailHTML(imp) {
+        const semGG = diffDays(imp['ult sem']);
+        const vpGG = diffDays(imp['utl vp']);
+        const ann = db.annotazioni.filter(a => String(a.impianto_ann) == String(imp.impianto));
+        const verb = db.verbali.filter(v => String(v.IMPIANTO) == String(imp.impianto));
+        const dcList = db.archivio.map((v, i) => ({...v, oIdx: i})).filter(a => String(a['N°IMPIANTO ESA']) == String(imp.impianto));
+        const commList = db.commesse.map((v, i) => ({...v, oIdx: i})).filter(c => String(c['ID Imp.']) == String(imp.impianto));
 
-    const dcList = (db.archivio || []).map((v, i) => ({ ...v, oIdx: i }))
-      .filter(a => String(a['N°IMPIANTO ESA']) == String(imp.impianto));
-    const commList = (db.commesse || []).map((v, i) => ({ ...v, oIdx: i }))
-      .filter(c => String(c['ID Imp.']) == String(imp.impianto));
+        return `<div class="space-y-8 pb-10">
+            <div class="flex flex-col md:flex-row justify-between items-start border-b border-slate-100 pb-6 gap-6">
+                <div class="space-y-2">
+                    <h2 class="text-5xl font-black text-slate-900 tracking-tighter">${imp.impianto} <span class="text-2xl">📝</span></h2>
+                    <p class="text-xl font-bold text-slate-700 leading-tight">${imp['Indirizzo impianto']}</p>
+                    <p class="text-slate-400 font-black uppercase text-xs tracking-widest">${imp['Località impianto']} - Zona ${imp.zona}</p>
+                </div>
+                <div class="bg-slate-900 text-white p-5 rounded-3xl min-w-[200px] text-center shadow-xl border-4 border-slate-800 shrink-0">
+                    <span class="block text-[10px] uppercase opacity-40 font-bold mb-1 tracking-widest text-blue-300">Matricola</span>
+                    <span class="text-2xl font-mono font-bold">${imp.matricola || '---'}</span>
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 text-xs space-y-2">
+                    <span class="block text-[10px] font-black text-blue-600 uppercase tracking-widest border-b pb-1">Responsabili</span>
+                    <p>Comm: <b>${imp.venditore} - ${db.mappature.comm[imp.venditore] || ''}</b></p>
+                    <p>Giro: <b>${imp.giro} - ${db.mappature.giri[imp.giro] || ''}</b></p>
+                </div>
+                <div class="p-5 rounded-2xl border ${semGG > 180 ? 'bg-red-50 border-red-100 text-red-900' : 'bg-blue-50 border-blue-100 text-blue-900'}">
+                    <span class="block text-[10px] font-black uppercase opacity-60">Visite</span>
+                    <p class="text-xs">Mese Sem: <b class="uppercase">${imp['mese sem'] || '---'}</b></p>
+                    <p class="text-xs font-bold pt-1">Ultima: ${formatDate(excelToDate(imp['ult sem']))} [${semGG || '---'} gg]</p>
+                </div>
+                <div class="p-5 bg-amber-50 rounded-2xl border border-amber-100 text-amber-900">
+                    <span class="block text-[10px] font-black uppercase opacity-60 font-bold">Verifica ENTE</span>
+                    <p class="text-xs font-bold">Ultima: ${formatDate(excelToDate(imp['utl vp']))}</p>
+                    <p class="text-[10px] font-bold opacity-60 mt-1 uppercase">Da ${vpGG || '---'} giorni</p>
+                </div>
+            </div>
+            <div class="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+                <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-center border-b pb-4">
+                    <div class="border-r"><span class="text-slate-400 font-bold uppercase text-[9px]">Manut.</span><p class="text-2xl font-black text-blue-600">${imp.manut || 'SA'}</p></div>
+                    <div class="border-r"><span class="text-slate-400 font-bold uppercase text-[9px]">T. Cliente</span><p class="text-2xl font-black text-slate-700">${imp['tipo cliente'] || 'P'}</p></div>
+                    <div><span class="text-slate-400 font-bold uppercase text-[9px]">Periodo</span><p class="text-xl font-bold text-slate-800">${imp.periodicità || '180'} gg</p></div>
+                </div>
+                <div class="pt-2">
+                    <span class="text-slate-400 font-bold uppercase text-[9px]">Anagrafica Cliente</span>
+                    <p class="text-lg font-black text-slate-800 leading-tight">${imp.Cliente || '---'}</p>
+                    <p class="text-xs text-blue-600 font-bold mt-1">Amm: ${imp.Amministratore || '---'}</p>
+                    <div class="mt-4 p-4 bg-slate-50 rounded-xl italic text-xs text-slate-600">Note: ${imp.note || 'Nessuna nota specifica'}</div>
+                </div>
+            </div>
+            <div class="space-y-4"><h4 class="text-sm font-black text-slate-900 uppercase tracking-tighter">Ultime Annotazioni</h4><div class="grid grid-cols-1 md:grid-cols-2 gap-3">${ann.length ? ann.map(a => `<div class="p-4 bg-slate-50 rounded-2xl text-xs border border-slate-100"><div class="flex justify-between font-black text-blue-600 mb-2"><span>${a.giorno_ann}/${a.mese_ann}/${a.anno_ann}</span><span class="text-slate-400">👨‍🔧 ${a.tecnico_ann || ''}</span></div><p class="text-slate-700 leading-relaxed">${a.note || '---'}</p></div>`).join('') : '<p class="text-xs text-slate-300 italic">Nessun dato registrato</p>'}</div></div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6"><div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm space-y-3"><h4 class="text-[10px] font-black text-slate-400 uppercase tracking-widest italic">Verbali PDF</h4><div class="space-y-1">${verb.map(v => `<div class="text-[10px] font-bold text-red-700 bg-red-50 p-1.5 rounded border border-red-100 truncate"><i class="fas fa-file-pdf mr-1"></i>${v['NOME FILE']}</div>`).join('') || '---'}</div></div><div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm space-y-3"><h4 class="text-[10px] font-black text-emerald-600 uppercase tracking-widest italic">Archivio DC</h4><div class="space-y-2">${dcList.map(d => `<div class="flex justify-between items-center bg-emerald-50 p-2 rounded-lg border border-emerald-100 text-[9px] font-bold"><span>PR. ${d['N°  PRATICA ARCHIVIO']}</span><button onclick="event.stopPropagation(); showDcInfo(${d.oIdx})" class="bg-emerald-600 text-white px-2 py-0.5 rounded-lg shadow-sm">INFO</button></div>`).join('') || 'Nessuna DC'}</div></div><div class="bg-white p-5 border border-slate-200 rounded-2xl shadow-sm space-y-3"><h4 class="text-[10px] font-black text-amber-600 uppercase tracking-widest italic">Commesse</h4><div class="space-y-2">${commList.map(c => `<div class="flex justify-between items-center bg-amber-50 p-2 rounded-lg border border-amber-100 text-[9px] font-bold"><span>${c['Numero Commessa']}</span><button onclick="event.stopPropagation(); showCommessaInfo(${c.oIdx})" class="bg-amber-600 text-white px-2 py-0.5 rounded-lg shadow-sm">INFO</button></div>`).join('') || 'Nessuna Commessa'}</div></div></div>
+        </div>`;
+    }
 
-    const giroName = db.mappature?.giri?.[imp.giro] || imp.giro || '---';
-    const commName = db.mappature?.comm?.[imp.venditore] || imp.venditore || '---';
-
-    return `
-      <div class="space-y-8 pb-10">
-        <h2 class="text-4xl font-black text-slate-900">${esc(imp.impianto)} 📝</h2>
-        <p class="text-xl font-bold text-slate-700">${esc(imp['Indirizzo impianto'])} (${esc(imp['Località impianto'])})</p>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div class="p-4 bg-slate-50 rounded-xl">
-            <span class="text-[10px] uppercase font-bold text-slate-400">Responsabili</span>
-            <p class="text-xs mt-2">Giro: <b>${esc(giroName)}</b></p>
-            <p class="text-xs">Comm: <b>${esc(commName)}</b></p>
-          </div>
-
-          <div class="p-4 rounded-xl border ${(semGG != null && semGG > 180) ? 'bg-red-50' : 'bg-blue-50'}">
-            <span class="text-[10px] uppercase font-bold opacity-50">Semestrale</span>
-            <p class="text-sm font-bold">${esc(semDate)} [${esc(semText)}]</p>
-          </div>
-
-          <div class="p-4 bg-amber-50 rounded-xl">
-            <span class="text-[10px] uppercase font-bold opacity-50">Visita Ente</span>
-            <p class="text-sm font-bold">${esc(vpDate)} [${esc(vpText)}]</p>
-          </div>
-        </div>
-
-        <div class="bg-white p-6 rounded-2xl border border-slate-200">
-          <p class="text-sm">Cliente: <b>${esc(imp.Cliente || '---')}</b></p>
-          <p class="text-xs text-blue-600">Amministratore: ${esc(imp.Amministratore || '---')}</p>
-          <div class="mt-4 p-3 bg-slate-50 rounded text-xs italic">Note: ${esc(imp.note || 'Nessuna')}</div>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div class="bg-white p-4 border rounded-xl">
-            <h4 class="text-[10px] font-bold uppercase mb-2">Commesse</h4>
-            ${commList.length ? commList.map(c => `
-              <div class="flex justify-between items-center bg-amber-50 p-1 mb-1 rounded text-[10px]">
-                <span>${esc(c['Numero Commessa'])}</span>
-                <button onclick="event.stopPropagation(); showCommessaInfo(${c.oIdx})" class="bg-amber-600 text-white px-2 rounded">INFO</button>
-              </div>`).join('') : '---'}
-          </div>
-
-          <div class="bg-white p-4 border rounded-xl">
-            <h4 class="text-[10px] font-bold uppercase mb-2">Archivio DC</h4>
-            ${dcList.length ? dcList.map(d => `
-              <div class="flex justify-between items-center bg-emerald-50 p-1 mb-1 rounded text-[10px]">
-                <span>PR. ${esc(d['N°  PRATICA ARCHIVIO'])}</span>
-                <button onclick="event.stopPropagation(); showDcInfo(${d.oIdx})" class="bg-emerald-600 text-white px-2 rounded">INFO</button>
-              </div>`).join('') : '---'}
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  // Avvio
-  initDatabase();
+    initDatabase();
 </script>
